@@ -85,14 +85,6 @@ window.addEventListener("keydown", (e) => {
   if ((key === "e" || key === "enter") && !state.inDialogue && nearestNpcGlobal) {
     openDialogue(nearestNpcGlobal.mission);
   }
-  
-  // Emotes del jugador (A5)
-  if ((key === "1" || key === "2" || key === "3" || key === "4" || key === "f") && !state.inDialogue && !playerState.isJumping && playerState.moveSpeed === 0) {
-    if (key === "1" || key === "f") playEmote(emotes.wave);
-    if (key === "2") playEmote(emotes.yes);
-    if (key === "3") playEmote(emotes.no);
-    if (key === "4") playEmote(emotes.cheer);
-  }
 });
 window.addEventListener("keyup", (e) => { keys.delete(e.key.toLowerCase()); });
 
@@ -1899,6 +1891,17 @@ function createScene() {
       if (feel === "fov") setFeel("tps");
       else if (feel === "tps") setFeel("follow");
       else setFeel("fov");
+    }
+
+    // Emotes del jugador (A5) — playerState/emotes/playEmote solo existen aquí,
+    // dentro de createScene (el handler global de arriba no tiene acceso a ellos).
+    const key = e.key.toLowerCase();
+    if ((key === "1" || key === "2" || key === "3" || key === "4" || key === "f") &&
+        !isTypingTarget(e.target) && !state.inDialogue && !playerState.isJumping && playerState.moveSpeed === 0) {
+      if (key === "1" || key === "f") playEmote(emotes.wave);
+      if (key === "2") playEmote(emotes.yes);
+      if (key === "3") playEmote(emotes.no);
+      if (key === "4") playEmote(emotes.cheer);
     }
   });
 
