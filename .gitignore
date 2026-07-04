@@ -1,0 +1,14 @@
+# Sistema / editor
+.DS_Store
+Thumbs.db
+*.log
+
+# Nada de contexto de desarrollo en el repo público
+.claude/
+brain/
+docs/
+tests/
+scripts/
+HANDOFF.md
+AGENTS.md
+patch_world.py

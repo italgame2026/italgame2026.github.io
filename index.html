@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1a1410" />
+    <title>italgame · prototipo Babylon.js</title>
+    <style>
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #1a1410; font-family: system-ui, -apple-system, sans-serif; }
+      #renderCanvas { width: 100%; height: 100%; display: block; touch-action: none; outline: none; }
+
+      .overlay { position: fixed; color: #f8f1df; pointer-events: none; user-select: none; }
+      #hud { top: 14px; left: 16px; max-width: 260px; }
+      #hud .tag { display: inline-block; font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+        color: #f2b84b; background: rgba(0,0,0,.35); padding: 3px 9px; border-radius: 99px; }
+      #hud h1 { font-size: 19px; margin: 8px 0 4px; font-weight: 800; }
+      #hud p { font-size: 13px; line-height: 1.5; margin: 0; color: #d8cdb8; }
+      #hud kbd { background: rgba(248,241,223,.14); border: 1px solid rgba(248,241,223,.25);
+        border-radius: 5px; padding: 1px 6px; font-size: 12px; font-family: inherit; }
+
+      #loading { inset: 0; display: grid; place-items: center; background: #1a1410; z-index: 10;
+        font-size: 15px; color: #d8cdb8; transition: opacity .5s; }
+      #loading.hidden { opacity: 0; pointer-events: none; }
+      .spinner { width: 34px; height: 34px; border: 3px solid rgba(242,184,75,.25);
+        border-top-color: #f2b84b; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 14px; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      #loading .col { display: flex; flex-direction: column; align-items: center; }
+
+      /* Selector de "feel" (cámara) */
+      #feelSwitch { top: 14px; right: 14px; display: flex; gap: 6px; pointer-events: auto; }
+      #feelSwitch button { font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+        color: #d8cdb8; background: rgba(0,0,0,.42); border: 1px solid rgba(248,241,223,.22);
+        border-radius: 8px; padding: 7px 11px; backdrop-filter: blur(4px); transition: all .15s; }
+      #feelSwitch button:hover { color: #f8f1df; border-color: rgba(248,241,223,.5); }
+      #feelSwitch button.active { color: #1a1410; background: #f2b84b; border-color: #f2b84b; }
+
+      #visualSwitch { top: 58px; right: 14px; pointer-events: auto; }
+      #visualSwitch button { font: inherit; min-height: 44px; font-size: 12px; font-weight: 800; cursor: pointer;
+        color: #d8cdb8; background: rgba(0,0,0,.42); border: 1px solid rgba(248,241,223,.22);
+        border-radius: 8px; padding: 9px 12px; backdrop-filter: blur(4px); transition: all .15s; }
+      #visualSwitch button:hover { color: #f8f1df; border-color: rgba(248,241,223,.5); }
+      #visualSwitch button.active { color: #1a1410; background: #f2b84b; border-color: #f2b84b; }
+
+      /* Mando táctil simple para móvil */
+      #touchPad { position: fixed; left: 18px; bottom: 18px; width: 120px; height: 120px;
+        border-radius: 50%; background: rgba(248,241,223,.08); border: 1px solid rgba(248,241,223,.18);
+        display: none; touch-action: none; }
+      #touchNub { position: absolute; left: 35px; top: 35px; width: 50px; height: 50px; border-radius: 50%;
+        background: rgba(242,184,75,.65); }
+      @media (pointer: coarse) { #touchPad { display: block; } }
+
+      /* Selector de música */
+      .music-track-item {
+        display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+        border-radius: 10px; cursor: pointer; transition: all .18s;
+        border: 1px solid transparent; color: #d8cdb8; font: 500 13px 'Inter', sans-serif;
+      }
+      .music-track-item:hover { background: rgba(242,184,75,0.1); border-color: rgba(242,184,75,0.25); color: #f8f1df; }
+      .music-track-item.playing { background: rgba(76,217,100,0.1); border-color: rgba(76,217,100,0.35); color: #4cd964; }
+      .music-track-item .track-num { width: 22px; height: 22px; border-radius: 6px; display: inline-flex;
+        align-items: center; justify-content: center; font: 700 11px 'Outfit',sans-serif;
+        background: rgba(248,241,223,0.08); color: #a69886; flex-shrink: 0; }
+      .music-track-item.playing .track-num { background: #4cd964; color: #102014; }
+      .music-track-item .track-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    </style>
+    <!-- Google Fonts para diálogos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <style>
+      /* Estilos para el Panel de Diálogo Interactivo */
+      #dialogue-panel {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(8px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
+        box-sizing: border-box;
+        animation: fadeIn 0.3s ease-out;
+      }
+
+      .dialogue-container {
+        background: rgba(26, 20, 16, 0.95);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(242, 184, 75, 0.3);
+        border-radius: 20px;
+        max-width: 600px;
+        width: 100%;
+        max-height: 85vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        animation: slideUpFade 0.4s ease-out;
+        position: relative;
+      }
+
+      .dialogue-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 18px 22px;
+        border-bottom: 1px solid rgba(248, 241, 223, 0.1);
+        position: sticky;
+        top: 0;
+        background: rgba(26, 20, 16, 0.98);
+        backdrop-filter: blur(16px);
+        z-index: 10;
+        border-radius: 20px 20px 0 0;
+      }
+
+      .dialogue-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f2b84b, #c76f45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: 700;
+        color: #1a1410;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(242, 184, 75, 0.3);
+      }
+
+      .dialogue-speaker-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .dialogue-speaker {
+        font-family: 'Outfit', sans-serif;
+        font-size: 17px;
+        font-weight: 700;
+        color: #f2b84b;
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      .dialogue-speaker-role {
+        font-size: 12px;
+        color: #a69886;
+        margin-top: 2px;
+      }
+
+      .dialogue-close {
+        background: rgba(248, 241, 223, 0.08);
+        border: 1px solid rgba(248, 241, 223, 0.15);
+        color: #d8cdb8;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+
+      .dialogue-close:hover {
+        background: rgba(248, 241, 223, 0.15);
+        color: #f8f1df;
+        transform: rotate(90deg);
+      }
+
+      .dialogue-body {
+        padding: 22px;
+      }
+
+      .dialogue-text {
+        font-family: 'Inter', sans-serif;
+        font-size: 15px;
+        line-height: 1.7;
+        color: #f8f1df;
+        margin-bottom: 20px;
+        font-weight: 400;
+      }
+
+      .dialogue-text em {
+        color: #f2b84b;
+        font-style: normal;
+        font-weight: 600;
+      }
+
+      .dialogue-tools {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+
+      .dialogue-tool-btn {
+        background: rgba(248, 241, 223, 0.06);
+        border: 1px solid rgba(248, 241, 223, 0.12);
+        color: #d8cdb8;
+        padding: 6px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 36px;
+      }
+
+      .dialogue-tool-btn:hover {
+        background: rgba(242, 184, 75, 0.12);
+        border-color: rgba(242, 184, 75, 0.3);
+        color: #f2b84b;
+      }
+
+      .dialogue-tool-btn:active {
+        transform: scale(0.96);
+      }
+
+      .dialogue-options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .dialogue-option {
+        background: rgba(248, 241, 223, 0.04);
+        border: 1px solid rgba(248, 241, 223, 0.15);
+        color: #f8f1df;
+        padding: 12px 16px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: left;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        line-height: 1.5;
+        min-height: 48px;
+      }
+
+      .dialogue-option:hover {
+        background: rgba(242, 184, 75, 0.1);
+        border-color: rgba(242, 184, 75, 0.35);
+        transform: translateX(4px);
+      }
+
+      .dialogue-option:active {
+        transform: translateX(2px) scale(0.98);
+      }
+
+      .option-marker {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: rgba(242, 184, 75, 0.15);
+        color: #f2b84b;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      .dialogue-option.correct {
+        background: rgba(76, 217, 100, 0.15);
+        border-color: rgba(76, 217, 100, 0.4);
+        color: #4cd964;
+      }
+
+      .dialogue-option.correct .option-marker {
+        background: #4cd964;
+        color: #102014;
+      }
+
+      .dialogue-option.wrong {
+        background: rgba(255, 69, 58, 0.12);
+        border-color: rgba(255, 69, 58, 0.35);
+        color: #ff6b6b;
+      }
+
+      .dialogue-option.wrong .option-marker {
+        background: #ff6b6b;
+        color: #2a0a0a;
+      }
+
+      .dialogue-feedback {
+        margin-top: 18px;
+        padding: 14px 16px;
+        border-radius: 12px;
+        font-size: 14px;
+        line-height: 1.6;
+        animation: fadeInUp 0.3s ease-out;
+      }
+
+      .dialogue-feedback.correct {
+        background: rgba(76, 217, 100, 0.1);
+        border: 1px solid rgba(76, 217, 100, 0.3);
+        color: #4cd964;
+      }
+
+      .dialogue-feedback.wrong {
+        background: rgba(255, 69, 58, 0.08);
+        border: 1px solid rgba(255, 69, 58, 0.25);
+        color: #ff6b6b;
+      }
+
+      .feedback-status {
+        font-weight: 700;
+        font-size: 15px;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .feedback-explanation {
+        font-size: 13px;
+        opacity: 0.9;
+        margin-top: 4px;
+      }
+
+      .dialogue-footer {
+        padding: 16px 22px;
+        border-top: 1px solid rgba(248, 241, 223, 0.08);
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        background: rgba(26, 20, 16, 0.6);
+        border-radius: 0 0 20px 20px;
+      }
+
+      .dialogue-action-btn {
+        background: #f2b84b;
+        color: #1a1410;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.2s;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .dialogue-action-btn:hover {
+        background: #f5c563;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(242, 184, 75, 0.3);
+      }
+
+      .dialogue-action-btn:active {
+        transform: translateY(0);
+      }
+
+      .dialogue-action-btn.secondary {
+        background: rgba(248, 241, 223, 0.08);
+        color: #d8cdb8;
+        border: 1px solid rgba(248, 241, 223, 0.15);
+      }
+
+      .dialogue-action-btn.secondary:hover {
+        background: rgba(248, 241, 223, 0.12);
+        color: #f8f1df;
+      }
+
+      /* Perfil inicial */
+      .profile-setup {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .profile-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .profile-field span {
+        font-size: 12px;
+        font-weight: 600;
+        color: #a69886;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .profile-field input {
+        background: rgba(248, 241, 223, 0.06);
+        border: 1px solid rgba(248, 241, 223, 0.18);
+        color: #f8f1df;
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-size: 15px;
+        font-family: 'Inter', sans-serif;
+        transition: all 0.2s;
+        min-height: 44px;
+      }
+
+      .profile-field input:focus {
+        outline: none;
+        border-color: #f2b84b;
+        background: rgba(248, 241, 223, 0.08);
+      }
+
+      .profile-avatar-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+      }
+
+      .profile-avatar-choice {
+        background: rgba(248, 241, 223, 0.04);
+        border: 1px solid rgba(248, 241, 223, 0.15);
+        color: #d8cdb8;
+        padding: 12px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.2s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        min-height: 80px;
+      }
+
+      .profile-avatar-choice:hover {
+        background: rgba(242, 184, 75, 0.08);
+        border-color: rgba(242, 184, 75, 0.25);
+        color: #f8f1df;
+      }
+
+      .profile-avatar-choice.active {
+        background: rgba(76, 217, 100, 0.12);
+        border-color: rgba(76, 217, 100, 0.4);
+        color: #4cd964;
+      }
+
+      .profile-avatar-preview {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        color: #1a1410;
+        font-size: 0;
+        box-shadow: inset 0 -10px 0 rgba(0, 0, 0, 0.18);
+      }
+
+      .profile-avatar-preview::before {
+        content: '';
+        position: absolute;
+        top: 5px;
+        width: 18px;
+        height: 12px;
+        border-radius: 10px 10px 4px 4px;
+        background: var(--hair);
+      }
+
+      .profile-avatar-preview::after {
+        content: '';
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: currentColor;
+        box-shadow: 0 13px 0 5px currentColor;
+      }
+
+      /* Animaciones clave */
+      @keyframes slideUpFade {
+        from {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      /* Adaptación Responsive */
+      @media (max-width: 480px) {
+        #dialogue-panel {
+          padding: 16px;
+        }
+        
+        .dialogue-container {
+          padding: 18px 20px;
+          border-radius: 16px;
+        }
+        
+        .dialogue-text {
+          font-size: 14px;
+          line-height: 1.5;
+          margin-bottom: 16px;
+        }
+        
+        .dialogue-option {
+          padding: 10px 14px;
+          font-size: 13px;
+          border-radius: 10px;
+        }
+        
+        .dialogue-avatar {
+          width: 38px;
+          height: 38px;
+        }
+        
+        .avatar-letter {
+          font-size: 16px;
+        }
+        
+        .dialogue-speaker {
+          font-size: 15px;
+        }
+
+        .dialogue-tool-btn {
+          width: 34px;
+          height: 34px;
+          font-size: 14px;
+        }
+        
+        .feedback-status {
+          font-size: 14px;
+        }
+        
+        .feedback-explanation {
+          font-size: 12.5px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="renderCanvas"></canvas>
+
+    <div id="hud" class="overlay">
+      <span class="tag">italgame · v0.4 prototipo</span>
+      <h1>Motor Babylon.js</h1>
+      <p>
+        <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> moverse ·
+        <kbd>Shift</kbd> correr · <kbd>Space</kbd> saltar · <kbd>Ctrl</kbd> agacharse · <kbd>V</kbd> cambiar vista · arrastra para girar.
+      </p>
+    </div>
+
+    <div id="feelSwitch" class="overlay">
+      <button data-feel="tps" class="active">3ª persona</button>
+      <button data-feel="fov">1ª persona</button>
+    </div>
+
+    <div id="visualSwitch" class="overlay" style="display: flex; align-items: center; gap: 6px;">
+      <button id="shadowToggle" type="button" aria-pressed="false">Sombras</button>
+      <button id="musicToggle" type="button" aria-pressed="true" style="min-width: 44px;">🎵</button>
+      <button id="musicSelectBtn" type="button" style="min-width: 44px; font-size: 14px;" title="Seleccionar música">🎶</button>
+      <div style="position: relative; display: flex; align-items: center;">
+        <button id="volumeBtn" type="button" style="min-width: 44px; display: flex; align-items: center; justify-content: center; font-size: 16px;">🔊</button>
+        <div id="volumeSliderContainer" style="display: none; position: absolute; right: 0; top: 48px; background: rgba(26, 20, 16, 0.95); border: 1px solid rgba(242, 184, 75, 0.3); border-radius: 8px; padding: 10px; backdrop-filter: blur(8px); width: 120px; align-items: center; justify-content: center; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+          <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.15" style="width: 100%; cursor: pointer; accent-color: #f2b84b;">
+        </div>
+      </div>
+    </div>
+
+    <div id="touchPad" aria-hidden="true"><div id="touchNub"></div></div>
+
+    <!-- Panel selector de música -->
+    <div id="musicSelector" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:200; width:340px; max-height:80vh; background:rgba(26,20,16,0.92); backdrop-filter:blur(16px); border:1px solid rgba(242,184,75,0.3); border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,0.6); overflow:hidden;">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid rgba(248,241,223,0.1);">
+        <span style="font-family:'Outfit',sans-serif; font-size:16px; font-weight:700; color:#f2b84b;">🎶 Música</span>
+        <button id="musicSelectorClose" type="button" style="background:rgba(248,241,223,0.08); border:1px solid rgba(248,241,223,0.15); color:#d8cdb8; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;">×</button>
+      </div>
+      <div id="musicTrackList" style="padding:12px; overflow-y:auto; max-height:60vh;"></div>
+    </div>
+
+    <!-- Panel de Diálogo Interactivo -->
+    <div id="dialogue-panel">
+      <div class="dialogue-container">
+        <div class="dialogue-header">
+          <div class="dialogue-avatar">
+            <span class="avatar-letter" id="dialogue-avatar-char">N</span>
+          </div>
+          <div class="dialogue-speaker-info">
+            <h3 class="dialogue-speaker" id="dialogue-speaker">NPC</h3>
+            <div class="dialogue-speaker-role" id="dialogue-speaker-role">Personaje</div>
+          </div>
+          <button class="dialogue-close" id="dialogueClose" aria-label="Cerrar diálogo">×</button>
+        </div>
+        <div class="dialogue-body">
+          <div class="dialogue-tools">
+            <button class="dialogue-tool-btn" id="speakDialogueBtn" title="Escuchar diálogo">🔊 Escuchar</button>
+            <button class="dialogue-tool-btn" id="translateDialogueBtn" title="Mostrar traducción">🌐 Traducir</button>
+            <button class="dialogue-tool-btn" id="dialoguePlayAllBtn" title="Reproducir todo">▶️ Todo</button>
+            <button class="dialogue-tool-btn" id="dialogueTranslateAllBtn" title="Traducir todo">📖 Todo</button>
+          </div>
+          <div class="dialogue-text" id="dialogue-text">
+            Ciao! Come posso aiutarti?
+          </div>
+          <div class="dialogue-options" id="dialogue-options">
+            <!-- Las opciones se generan dinámicamente -->
+          </div>
+          <div class="dialogue-feedback" id="dialogue-feedback" style="display:none;">
+            <div class="feedback-status" id="dialogue-feedback-status">
+              <span class="feedback-title" id="dialogue-feedback-title"></span>
+              <button class="dialogue-tool-btn" id="speakFeedbackBtn" style="display:none;" title="Escuchar">🔊</button>
+              <button class="dialogue-tool-btn" id="translateFeedbackBtn" style="display:none;" title="Mostrar traducción">ES</button>
+            </div>
+            <div class="feedback-explanation" id="dialogue-explanation"></div>
+            <button class="dialogue-action-btn" id="dialogue-next-btn">Continuar →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Creador de personaje: inyectado dinámicamente por game/character.js (no duplicar aquí) -->
+
+    <!-- Pantalla de bienvenida -->
+    <div id="welcome-screen" style="display:none; position:fixed; inset:0; z-index:120; background:rgba(26,20,16,0.95); backdrop-filter:blur(12px); overflow-y:auto;">
+      <div style="max-width:600px; margin:0 auto; padding:40px 20px; text-align:center;">
+        <h1 style="color:#f2b84b; font-family:'Outfit',sans-serif; font-size:28px; margin-bottom:20px;">Benvenuto en Italia!</h1>
+        <p style="color:#f8f1df; font-size:15px; line-height:1.7; margin-bottom:24px;">
+          Eres un estudiante de intercambio en una encantadora ciudad italiana. Tu misión: aprender italiano mientras exploras la plaza, hablas con los lugareños y descubres los secretos de la cultura italiana.
+        </p>
+        <p style="color:#d8cdb8; font-size:14px; line-height:1.6; margin-bottom:30px;">
+          Acércate a los personajes (indicados con su nombre flotante) y presiona <kbd style="background:rgba(248,241,223,.14); border:1px solid rgba(248,241,223,.25); border-radius:5px; padding:2px 8px; font-size:12px;">E</kbd> para hablar con ellos. Cada conversación te enseñará vocabulario y gramática italiana en contexto.
+        </p>
+        <button id="welcomeStartBtn" style="background:#f2b84b; color:#1a1410; border:none; padding:14px 32px; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer; font-family:'Inter',sans-serif;">
+          Comenzar aventura →
+        </button>
+      </div>
+    </div>
+
+    <div id="loading">
+      <div class="col">
+        <div class="spinner"></div>
+        <div id="loadingText">Cargando motor 3D…</div>
+      </div>
+    </div>
+
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+    <script src="data/curriculum.js" defer></script>
+    <script src="data/missions.js" defer></script>
+    <script src="audio/audio.js?v=3" defer></script>
+    <script src="game/state.js?v=33" defer></script>
+    <script src="game/character.js?v=2" defer></script>
+    <script src="game/dialogue.js?v=36" defer></script>
+    <script src="game/npcLoader.js?v=5" defer></script>
+    <script src="game/world.js?v=3" defer></script>
+    <script src="game.js?v=37" defer></script>
+  </body>
+</html>
