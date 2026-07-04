@@ -87,10 +87,7 @@ window.addEventListener("keydown", (e) => {
   if ((key === "e" || key === "enter") && !state.inDialogue && nearestNpcGlobal) {
     openDialogue(nearestNpcGlobal.mission);
   }
-  if (key === "escape" && state.inDialogue) {
-    e.preventDefault();
-    closeDialogue();
-  }
+  // Esc: gestionado por el registro global de modales (regla F1, index.html).
 });
 window.addEventListener("keyup", (e) => { keys.delete(e.key.toLowerCase()); });
 

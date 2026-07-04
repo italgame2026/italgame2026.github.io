@@ -313,11 +313,13 @@ function toggleMusicMute() {
       buildList();
       panel.style.display = "block";
       overlay.style.display = "block";
+      if (typeof window.registerModal === "function") window.registerModal("music", closeSelector);
     }
 
     function closeSelector() {
       panel.style.display = "none";
       overlay.style.display = "none";
+      if (typeof window.unregisterModal === "function") window.unregisterModal("music");
     }
 
     btn.addEventListener("click", openSelector);

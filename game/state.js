@@ -101,7 +101,7 @@ function updateGameHUD() {
       extras += `<span style="color: #ff9f43; font-size: 11px; display: block; margin-top: 2px;">🛡️ Protezione striscia</span>`;
     }
     hud.innerHTML = `
-      <span class="tag">italgame · v0.1 prototipo</span>
+      <span class="tag">italgame · v0.4 prototipo</span>
       <h1><span id="scoreDisplay">${state.playerName}: ${state.score} pt</span> | <span id="energyDisplay">Energia: ${state.energy}%</span></h1>
       <p style="margin-top: 6px; font-weight: 500; color: #f2b84b; margin-bottom: 0;">
         <span id="streakDisplay">Striscia (Racha): ${state.streak} 🔥</span>

@@ -53,13 +53,13 @@
       .music-track-item {
         display: flex; align-items: center; gap: 10px; padding: 10px 12px;
         border-radius: 10px; cursor: pointer; transition: all .18s;
-        border: 1px solid transparent; color: #d8cdb8; font: 500 13px 'Inter', sans-serif;
+        border: 1px solid transparent; color: #f0e8d0; font: 500 13px 'Inter', sans-serif;
       }
       .music-track-item:hover { background: rgba(242,184,75,0.1); border-color: rgba(242,184,75,0.25); color: #f8f1df; }
       .music-track-item.playing { background: rgba(76,217,100,0.1); border-color: rgba(76,217,100,0.35); color: #4cd964; }
       .music-track-item .track-num { width: 22px; height: 22px; border-radius: 6px; display: inline-flex;
         align-items: center; justify-content: center; font: 700 11px 'Outfit',sans-serif;
-        background: rgba(248,241,223,0.08); color: #a69886; flex-shrink: 0; }
+        background: rgba(248,241,223,0.08); color: #d8cdb8; flex-shrink: 0; }
       .music-track-item.playing .track-num { background: #4cd964; color: #102014; }
       .music-track-item .track-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     </style>
@@ -235,7 +235,7 @@
         background: rgba(248, 241, 223, 0.04);
         border: 1px solid rgba(248, 241, 223, 0.15);
         color: #f8f1df;
-        padding: 12px 16px;
+        padding: 12px 84px 12px 16px;
         border-radius: 12px;
         cursor: pointer;
         font-family: 'Inter', sans-serif;
@@ -248,6 +248,7 @@
         gap: 12px;
         line-height: 1.5;
         min-height: 48px;
+        position: relative;
       }
 
       .dialogue-option:hover {
@@ -258,6 +259,80 @@
 
       .dialogue-option:active {
         transform: translateX(2px) scale(0.98);
+      }
+
+      .option-text {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .translation-line {
+        display: none;
+      }
+
+      .translation-line.visible {
+        display: block;
+        margin-top: 4px;
+        font-size: 0.9em;
+        color: #a69886;
+      }
+
+      .translate-option-btn {
+        position: absolute;
+        right: 44px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(248, 241, 223, 0.08);
+        border: 1px solid rgba(248, 241, 223, 0.15);
+        color: #a69886;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        z-index: 2;
+      }
+
+      .translate-option-btn:hover {
+        background: rgba(242, 184, 75, 0.15);
+        border-color: rgba(242, 184, 75, 0.4);
+        color: #f2b84b;
+      }
+
+      .translate-option-btn.active {
+        background: #f2b84b;
+        border-color: #f2b84b;
+        color: #1a1410;
+      }
+
+      .speak-option-btn {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        color: #f2b84b;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+        padding: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+      }
+
+      .speak-option-btn:hover {
+        opacity: 1;
       }
 
       .option-marker {
@@ -538,7 +613,7 @@
         }
         
         .dialogue-option {
-          padding: 10px 14px;
+          padding: 10px 84px 10px 14px;
           font-size: 13px;
           border-radius: 10px;
         }
@@ -603,6 +678,9 @@
 
     <div id="touchPad" aria-hidden="true"><div id="touchNub"></div></div>
 
+    <!-- Overlay del selector de música: fondo clicable para cerrar (regla F1) -->
+    <div id="musicSelectorOverlay" style="display:none; position:fixed; inset:0; z-index:199; background:rgba(0,0,0,0.4);"></div>
+
     <!-- Panel selector de música -->
     <div id="musicSelector" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:200; width:340px; max-height:80vh; background:rgba(26,20,16,0.92); backdrop-filter:blur(16px); border:1px solid rgba(242,184,75,0.3); border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,0.6); overflow:hidden;">
       <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid rgba(248,241,223,0.1);">
@@ -630,7 +708,6 @@
             <button class="dialogue-tool-btn" id="speakDialogueBtn" title="Escuchar diálogo">🔊 Escuchar</button>
             <button class="dialogue-tool-btn" id="translateDialogueBtn" title="Mostrar traducción">🌐 Traducir</button>
             <button class="dialogue-tool-btn" id="dialoguePlayAllBtn" title="Reproducir todo">▶️ Todo</button>
-            <button class="dialogue-tool-btn" id="dialogueTranslateAllBtn" title="Traducir todo">📖 Todo</button>
           </div>
           <div class="dialogue-text" id="dialogue-text">
             Ciao! Come posso aiutarti?
@@ -678,14 +755,37 @@
 
     <script src="https://cdn.babylonjs.com/babylon.js"></script>
     <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+    <script>
+      // Registro global de modales (regla F1 de brain/reglas-de-oro.md): un único
+      // gestor de Esc que cierra el modal activo más alto de la pila, en vez de un
+      // "if" por cada state.inX. Cada módulo se registra con registerModal(id, closeFn).
+      (function () {
+        var stack = [];
+        window.registerModal = function (id, closeFn) {
+          stack = stack.filter(function (m) { return m.id !== id; });
+          stack.push({ id: id, close: closeFn });
+        };
+        window.unregisterModal = function (id) {
+          stack = stack.filter(function (m) { return m.id !== id; });
+        };
+        document.addEventListener("keydown", function (e) {
+          if (e.key !== "Escape" && e.key !== "Esc") return;
+          var t = e.target;
+          if (t && (["INPUT", "TEXTAREA", "SELECT"].indexOf(t.tagName) !== -1 || t.isContentEditable)) return;
+          if (!stack.length) return;
+          e.preventDefault();
+          stack[stack.length - 1].close();
+        });
+      })();
+    </script>
     <script src="data/curriculum.js" defer></script>
     <script src="data/missions.js" defer></script>
-    <script src="audio/audio.js?v=3" defer></script>
-    <script src="game/state.js?v=33" defer></script>
+    <script src="audio/audio.js?v=4" defer></script>
+    <script src="game/state.js?v=34" defer></script>
     <script src="game/character.js?v=2" defer></script>
-    <script src="game/dialogue.js?v=36" defer></script>
+    <script src="game/dialogue.js?v=38" defer></script>
     <script src="game/npcLoader.js?v=5" defer></script>
     <script src="game/world.js?v=3" defer></script>
-    <script src="game.js?v=37" defer></script>
+    <script src="game.js?v=38" defer></script>
   </body>
 </html>

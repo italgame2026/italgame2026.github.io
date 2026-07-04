@@ -526,7 +526,7 @@ function setTranslationsVisible(visible) {
   document.querySelectorAll("#dialogue-panel .translation-line").forEach(line => {
     line.classList.toggle("visible", visible);
   });
-  document.querySelectorAll("#dialogue-panel .translate-option-btn, #translateDialogueBtn, #translateFeedbackBtn, #dialogueTranslateAllBtn").forEach(btn => {
+  document.querySelectorAll("#dialogue-panel .translate-option-btn, #translateDialogueBtn, #translateFeedbackBtn").forEach(btn => {
     btn.classList.toggle("active", visible);
     btn.setAttribute("aria-pressed", visible ? "true" : "false");
   });
@@ -544,20 +544,17 @@ function toggleTranslationNear(button, selector) {
 
 function setupDialogueHeaderTools() {
   const playAllBtn = document.getElementById("dialoguePlayAllBtn");
-  const translateAllBtn = document.getElementById("dialogueTranslateAllBtn");
+  const closeBtn = document.getElementById("dialogueClose");
+
+  if (closeBtn) {
+    closeBtn.onclick = closeDialogue;
+  }
 
   if (playAllBtn) {
     playAllBtn.style.display = "inline-flex";
     playAllBtn.onclick = () => {
       toggleCurrentInteractionAudio();
     };
-  }
-
-  if (translateAllBtn) {
-    translateAllBtn.style.display = "inline-flex";
-    translateAllBtn.onclick = () => setTranslationsVisible(!dialogueTranslationsVisible);
-    translateAllBtn.classList.toggle("active", dialogueTranslationsVisible);
-    translateAllBtn.setAttribute("aria-pressed", dialogueTranslationsVisible ? "true" : "false");
   }
 }
 
@@ -658,11 +655,17 @@ function openDialogue(mission) {
     const speakDialogueBtn = document.getElementById("speakDialogueBtn");
     const translateDialogueBtn = document.getElementById("translateDialogueBtn");
     if (speakDialogueBtn) speakDialogueBtn.style.display = "none";
-    if (translateDialogueBtn) translateDialogueBtn.style.display = "none";
+    if (translateDialogueBtn) {
+      translateDialogueBtn.style.display = "inline-flex";
+      translateDialogueBtn.classList.toggle("active", dialogueTranslationsVisible);
+      translateDialogueBtn.setAttribute("aria-pressed", dialogueTranslationsVisible ? "true" : "false");
+      translateDialogueBtn.onclick = () => setTranslationsVisible(!dialogueTranslationsVisible);
+    }
 
+    const vocabVisibleClass = dialogueTranslationsVisible ? " visible" : "";
     let vocabHtml = `<div style="margin-bottom: 12px; font-weight: bold; color: #f2b84b; font-size: 16px;">Vocabolario della missione:</div><div style="max-height: 180px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px;">`;
     mission.vocab.forEach(v => {
-      vocabHtml += `<div style="margin-bottom: 8px; font-size: 15px; display: flex; align-items: center; gap: 8px;"><span style="color: #4cd964; font-weight: bold; cursor: pointer; background: rgba(76, 217, 100, 0.15); padding: 4px 10px; border-radius: 6px; font-size: 13.5px;" onclick="window.speakItalian('${v.it.replace(/'/g, "\\'")}')">🔊 ${v.it}</span> <span style="color: #a69886;">—</span> <span style="color: #d8cdb8;">${v.es}</span></div>`;
+      vocabHtml += `<div style="margin-bottom: 8px; font-size: 15px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;"><span style="color: #4cd964; font-weight: bold; cursor: pointer; background: rgba(76, 217, 100, 0.15); padding: 4px 10px; border-radius: 6px; font-size: 13.5px;" onclick="window.speakItalian('${v.it.replace(/'/g, "\\'")}')">🔊 ${escapeHtml(v.it)}</span><span class="translation-line${vocabVisibleClass}" style="margin-top: 0;">— ${escapeHtml(v.es)}</span></div>`;
 
       const key = v.it.toLowerCase();
       if (!state.vocabTracking[key]) {
@@ -726,7 +729,7 @@ function showDialogueStep() {
     translateDialogueBtn.style.display = "inline-flex";
     translateDialogueBtn.classList.toggle("active", dialogueTranslationsVisible);
     translateDialogueBtn.setAttribute("aria-pressed", dialogueTranslationsVisible ? "true" : "false");
-    translateDialogueBtn.onclick = () => toggleTranslationNear(translateDialogueBtn, "#dialogue-panel");
+    translateDialogueBtn.onclick = () => setTranslationsVisible(!dialogueTranslationsVisible);
   }
 
   optionsContainer.innerHTML = "";
@@ -739,14 +742,12 @@ function showDialogueStep() {
     const choiceText = fillPlayerName(choice.text);
     const btn = document.createElement("button");
     btn.className = "dialogue-option";
-    btn.style.position = "relative";
-    btn.style.paddingRight = "84px";
     const choiceKey = String.fromCharCode(65 + index);
     btn.dataset.dialogueChoiceKey = choiceKey.toLowerCase();
     btn.innerHTML = `<span class="option-marker">${choiceKey}</span>
                      <span class="option-text"><span>${escapeHtml(choiceText)}</span>${translationHtml(choice.text, { kind: "choice", step, mission })}</span>
                      <button type="button" class="translate-option-btn" title="Mostrar traducción">ES</button>
-                     <button type="button" class="speak-option-btn" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 16px; cursor: pointer; color: #f2b84b; opacity: 0.7; transition: opacity 0.2s; padding: 6px; display: flex; align-items: center; justify-content: center; z-index: 2;" title="Escuchar">🔊</button>`;
+                     <button type="button" class="speak-option-btn" title="Escuchar">🔊</button>`;
     
     btn.onclick = (e) => {
       if (e.target.closest(".speak-option-btn") || e.target.closest(".translate-option-btn")) return;
@@ -967,3 +968,10 @@ function closeDialogue() {
 }
 
 document.addEventListener("keydown", handleDialogueShortcuts);
+
+// Regla F1: el panel de diálogo (misión, bienvenida y perfil inicial reusan el
+// mismo #dialogue-panel + state.inDialogue) se registra una única vez en el
+// gestor global de Esc. Su close-fn no hace nada si el panel no está abierto.
+if (typeof window.registerModal === "function") {
+  window.registerModal("dialogue", () => { if (state.inDialogue) closeDialogue(); });
+}
