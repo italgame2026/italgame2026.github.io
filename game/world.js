@@ -5,6 +5,63 @@
 // Versión 0.4: Animales y vehículos con más detalle procedural
 // ============================================================================
 
+var VEHICLE_CONTAINERS = {};
+var ANIMAL_CONTAINERS = {};
+var _worldAssetsReady = false;
+
+var VEHICLE_MANIFEST = [
+  "ambulance", "delivery-flat", "delivery", "firetruck", "garbage-truck",
+  "hatchback-sports", "police", "sedan-sports", "sedan", "suv-luxury",
+  "suv", "taxi", "truck", "van"
+];
+
+var ANIMAL_MANIFEST = [
+  { key: "dog-beagle", file: "dog-beagle.glb" },
+  { key: "dog-husky", file: "dog-husky.glb" },
+  { key: "dog-shiba", file: "dog-shiba.glb" },
+  { key: "dog-simple", file: "dog-simple.glb" },
+  { key: "dove", file: "dove.glb" },
+  { key: "hen", file: "hen.glb" },
+  { key: "seagull", file: "seagull.glb" }
+];
+
+function loadWorldAssets(scene, onReady) {
+  var total = VEHICLE_MANIFEST.length + ANIMAL_MANIFEST.length;
+  var loaded = 0;
+  
+  function checkDone() {
+    if (++loaded === total) {
+      _worldAssetsReady = true;
+      if (typeof onReady === "function") onReady();
+    }
+  }
+
+  VEHICLE_MANIFEST.forEach(function(name) {
+    BABYLON.SceneLoader.LoadAssetContainerAsync("game/models/vehicles/kenney-car-kit/", name + ".glb", scene)
+      .then(function(container) {
+        VEHICLE_CONTAINERS[name] = container;
+        checkDone();
+      })
+      .catch(function(err) {
+        console.error("[world] Error cargando vehículo " + name + ":", err);
+        checkDone();
+      });
+  });
+
+  ANIMAL_MANIFEST.forEach(function(def) {
+    BABYLON.SceneLoader.LoadAssetContainerAsync("game/models/animals/", def.file, scene)
+      .then(function(container) {
+        ANIMAL_CONTAINERS[def.key] = container;
+        checkDone();
+      })
+      .catch(function(err) {
+        console.error("[world] Error cargando animal " + def.file + ":", err);
+        checkDone();
+      });
+  });
+}
+
+
 // --- Red de waypoints para peatones ----------------------------------------
 const WALK_NETWORK = [
   { id: 0, x: -15, z: -20 }, { id: 1, x: 0, z: -25 }, { id: 2, x: 15, z: -20 },
@@ -185,7 +242,81 @@ function updatePedestrians(dt, heroPos) {
 // --- ANIMALES MEJORADOS CON MÁS DETALLE ---
 const animals = [];
 
+function createGlbAnimal(scene, shadowCasterFn, type, x, z) {
+  var key = "";
+  if (type === "dog") {
+    var dogKeys = ["dog-beagle", "dog-husky", "dog-shiba", "dog-simple"];
+    key = dogKeys[Math.floor(Math.random() * dogKeys.length)];
+  } else if (type === "pigeon") {
+    var birdKeys = ["dove", "seagull", "hen"];
+    key = birdKeys[Math.floor(Math.random() * birdKeys.length)];
+  }
+
+  var container = ANIMAL_CONTAINERS[key];
+  if (!container) return null;
+
+  var root = new BABYLON.TransformNode(type + "_" + animals.length, scene);
+  root.position.set(x, 0, z);
+
+  var instances = container.instantiateModelsToScene();
+  var glbRoot = instances.rootNodes[0];
+  glbRoot.parent = root;
+
+  glbRoot.scaling.set(1, 1, 1);
+  var bounds = glbRoot.getHierarchyBoundingVectors();
+  var h = bounds.max.y - bounds.min.y;
+  var targetHeight = type === "dog" ? 0.55 : 0.3;
+  var scale = targetHeight / (h || 1.0);
+  glbRoot.scaling.set(scale, scale, scale);
+
+  if (shadowCasterFn) {
+    glbRoot.getChildMeshes().forEach(function(m) { shadowCasterFn(m); });
+  }
+
+  var idleAnim = null, walkAnim = null, runAnim = null;
+  var prefix = "anim_" + type + "_" + animals.length + "_";
+  instances.animationGroups.forEach(function(ag) {
+    var base = ag.name.replace(/^Clone of /i, "");
+    ag.name = prefix + base;
+    var lower = base.toLowerCase();
+    if (!idleAnim && (lower.includes("idle") || lower.includes("sit"))) idleAnim = ag;
+    if (!walkAnim && lower.includes("walk")) walkAnim = ag;
+    if (!runAnim && (lower.includes("run") || lower.includes("sprint") || lower.includes("fly") || lower.includes("flap"))) runAnim = ag;
+  });
+
+  if (!idleAnim) idleAnim = instances.animationGroups[0] || null;
+  if (!walkAnim) walkAnim = instances.animationGroups[1] || idleAnim;
+  if (!runAnim) runAnim = instances.animationGroups[2] || walkAnim;
+
+  instances.animationGroups.forEach(function(ag) { ag.stop(); });
+  if (idleAnim) idleAnim.start(true);
+
+  var animal = {
+    mesh: root,
+    type: type,
+    isGlb: true,
+    targetX: x + (Math.random() - 0.5) * 8,
+    targetZ: z + (Math.random() - 0.5) * 8,
+    speed: type === "pigeon" ? 1.8 : 1.2 + Math.random() * 0.8,
+    state: "wandering",
+    stateTimer: 3 + Math.random() * 4,
+    walkPhase: Math.random() * Math.PI * 2,
+    homeX: x,
+    homeZ: z,
+    idleAnim: idleAnim,
+    walkAnim: walkAnim,
+    runAnim: runAnim,
+    currentAnimGroup: idleAnim
+  };
+
+  animals.push(animal);
+  return animal;
+}
+
 function createDog(scene, shadowCasterFn, x, z) {
+  var glbDog = createGlbAnimal(scene, shadowCasterFn, "dog", x, z);
+  if (glbDog) return glbDog;
+
   const root = new BABYLON.TransformNode("dog_" + animals.length, scene);
   root.position.set(x, 0, z);
 
@@ -399,6 +530,9 @@ function createCat(scene, shadowCasterFn, x, z) {
 }
 
 function createPigeon(scene, shadowCasterFn, x, z) {
+  var glbPigeon = createGlbAnimal(scene, shadowCasterFn, "pigeon", x, z);
+  if (glbPigeon) return glbPigeon;
+
   const root = new BABYLON.TransformNode("pigeon_" + animals.length, scene);
   root.position.set(x, 0, z);
 
@@ -560,17 +694,19 @@ function updateAnimals(dt, heroPos) {
 
         // Animación de patas
         animal.walkPhase += dt * 10;
-        if (animal.type === "dog") {
-          animal.legFL.rotation.x = Math.sin(animal.walkPhase) * 0.4;
-          animal.legFR.rotation.x = -Math.sin(animal.walkPhase) * 0.4;
-          animal.legBL.rotation.x = -Math.sin(animal.walkPhase) * 0.4;
-          animal.legBR.rotation.x = Math.sin(animal.walkPhase) * 0.4;
-          animal.tail.rotation.z = Math.sin(animal.walkPhase * 2) * 0.4;
-        } else if (animal.type === "cat") {
-          animal.tail.rotation.z = Math.sin(animal.walkPhase) * 0.5;
-        } else if (animal.type === "pigeon") {
-          // Movimiento de cabeza al caminar
-          animal.head.position.y = 0.17 + Math.sin(animal.walkPhase * 2) * 0.01;
+        if (!animal.isGlb) {
+          if (animal.type === "dog") {
+            animal.legFL.rotation.x = Math.sin(animal.walkPhase) * 0.4;
+            animal.legFR.rotation.x = -Math.sin(animal.walkPhase) * 0.4;
+            animal.legBL.rotation.x = -Math.sin(animal.walkPhase) * 0.4;
+            animal.legBR.rotation.x = Math.sin(animal.walkPhase) * 0.4;
+            animal.tail.rotation.z = Math.sin(animal.walkPhase * 2) * 0.4;
+          } else if (animal.type === "cat") {
+            animal.tail.rotation.z = Math.sin(animal.walkPhase) * 0.5;
+          } else if (animal.type === "pigeon") {
+            // Movimiento de cabeza al caminar
+            animal.head.position.y = 0.17 + Math.sin(animal.walkPhase * 2) * 0.01;
+          }
         }
 
         animal.state = "wandering";
@@ -590,10 +726,27 @@ function updateAnimals(dt, heroPos) {
         animal.targetX = animal.homeX + (Math.random() - 0.5) * 8;
         animal.targetZ = animal.homeZ + (Math.random() - 0.5) * 8;
       }
-      if (animal.type === "pigeon" && animal.state === "pecking") {
+      if (animal.type === "pigeon" && animal.state === "pecking" && !animal.isGlb) {
         // Movimiento de cabeza al picotear
         animal.head.position.y = 0.15 + Math.sin(Date.now() * 0.012) * 0.025;
         animal.head.position.z = 0.12 + Math.sin(Date.now() * 0.012) * 0.025;
+      }
+    }
+
+    // Actualizar animaciones GLB
+    if (animal.isGlb) {
+      var targetAnim = animal.idleAnim;
+      if (animal.state === "fleeing") {
+        targetAnim = animal.runAnim || animal.walkAnim;
+      } else if (animal.state === "wandering") {
+        targetAnim = animal.walkAnim;
+      }
+      if (targetAnim) {
+        if (animal.currentAnimGroup !== targetAnim) {
+          if (animal.currentAnimGroup) animal.currentAnimGroup.stop();
+          targetAnim.start(true);
+          animal.currentAnimGroup = targetAnim;
+        }
       }
     }
 
@@ -606,167 +759,45 @@ function updateAnimals(dt, heroPos) {
 
 // --- VEHÍCULOS MEJORADOS CON MÁS DETALLE ---
 function createParkedCar(scene, shadowCasterFn, x, z, rotation, color) {
-  const root = new BABYLON.TransformNode("car_" + x + "_" + z, scene);
+  var idx = Math.floor(Math.abs(x + z)) % VEHICLE_MANIFEST.length;
+  var modelName = VEHICLE_MANIFEST[idx];
+  
+  if (x === 18 && z === -22) modelName = "taxi";
+  if (x === -22 && z === 12) modelName = "police";
+  if (x === 10 && z === 25) modelName = "suv-luxury";
+  
+  var container = VEHICLE_CONTAINERS[modelName];
+  if (!container) {
+    console.warn("[world] Vehículo " + modelName + " no cargado. Usando fallback.");
+    const root = new BABYLON.TransformNode("carFallback_" + x + "_" + z, scene);
+    root.position.set(x, 0, z);
+    root.rotation.y = rotation;
+    var box = BABYLON.MeshBuilder.CreateBox("carBox", { width: 1.7, height: 0.8, depth: 3.8 }, scene);
+    box.position.y = 0.4;
+    box.parent = root;
+    var mat = new BABYLON.StandardMaterial("carMat_" + x + "_" + z, scene);
+    mat.diffuseColor = BABYLON.Color3.FromHexString(color);
+    box.material = mat;
+    return root;
+  }
+
+  var root = new BABYLON.TransformNode("car_" + modelName + "_" + x + "_" + z, scene);
   root.position.set(x, 0, z);
   root.rotation.y = rotation;
 
-  const bodyMat = new BABYLON.StandardMaterial("carBody_" + x + "_" + z, scene);
-  bodyMat.diffuseColor = BABYLON.Color3.FromHexString(color);
-  bodyMat.specularColor = new BABYLON.Color3(0.4, 0.4, 0.4);
+  var instances = container.instantiateModelsToScene();
+  var glbRoot = instances.rootNodes[0];
+  glbRoot.parent = root;
 
-  // Cuerpo principal más detallado
-  const body = BABYLON.MeshBuilder.CreateBox("carBody", { width: 1.7, height: 0.65, depth: 3.8 }, scene);
-  body.position.set(0, 0.52, 0);
-  body.material = bodyMat;
-  body.parent = root;
-  shadowCasterFn(body);
+  glbRoot.scaling.set(1, 1, 1);
+  var bounds = glbRoot.getHierarchyBoundingVectors();
+  var h = bounds.max.y - bounds.min.y;
+  var scale = 1.35 / (h || 1.0);
+  glbRoot.scaling.set(scale, scale, scale);
 
-  // Guardabarros delanteros
-  const fenderFL = BABYLON.MeshBuilder.CreateBox("carFenderFL", { width: 0.2, height: 0.3, depth: 0.8 }, scene);
-  fenderFL.position.set(-0.85, 0.35, 1.2);
-  fenderFL.material = bodyMat;
-  fenderFL.parent = root;
-
-  const fenderFR = BABYLON.MeshBuilder.CreateBox("carFenderFR", { width: 0.2, height: 0.3, depth: 0.8 }, scene);
-  fenderFR.position.set(0.85, 0.35, 1.2);
-  fenderFR.material = bodyMat;
-  fenderFR.parent = root;
-
-  // Guardabarros traseros
-  const fenderBL = BABYLON.MeshBuilder.CreateBox("carFenderBL", { width: 0.2, height: 0.3, depth: 0.8 }, scene);
-  fenderBL.position.set(-0.85, 0.35, -1.2);
-  fenderBL.material = bodyMat;
-  fenderBL.parent = root;
-
-  const fenderBR = BABYLON.MeshBuilder.CreateBox("carFenderBR", { width: 0.2, height: 0.3, depth: 0.8 }, scene);
-  fenderBR.position.set(0.85, 0.35, -1.2);
-  fenderBR.material = bodyMat;
-  fenderBR.parent = root;
-
-  // Techo/cabina más aerodinámico
-  const cabin = BABYLON.MeshBuilder.CreateBox("carCabin", { width: 1.5, height: 0.52, depth: 2.0 }, scene);
-  cabin.position.set(0, 1.05, -0.15);
-  cabin.material = bodyMat;
-  cabin.parent = root;
-  shadowCasterFn(cabin);
-
-  // Capó inclinado
-  const hood = BABYLON.MeshBuilder.CreateBox("carHood", { width: 1.6, height: 0.08, depth: 1.2 }, scene);
-  hood.position.set(0, 0.85, 1.2);
-  hood.rotation.x = -0.1;
-  hood.material = bodyMat;
-  hood.parent = root;
-
-  // Maletero
-  const trunk = BABYLON.MeshBuilder.CreateBox("carTrunk", { width: 1.6, height: 0.08, depth: 0.8 }, scene);
-  trunk.position.set(0, 0.85, -1.4);
-  trunk.rotation.x = 0.1;
-  trunk.material = bodyMat;
-  trunk.parent = root;
-
-  // Ventanas
-  const glassMat = new BABYLON.StandardMaterial("carGlass_" + x + "_" + z, scene);
-  glassMat.diffuseColor = BABYLON.Color3.FromHexString("#7eb4c1");
-  glassMat.alpha = 0.6;
-  glassMat.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
-
-  // Parabrisas
-  const windshield = BABYLON.MeshBuilder.CreatePlane("carWindshield", { width: 1.4, height: 0.48 }, scene);
-  windshield.position.set(0, 1.05, 0.85);
-  windshield.rotation.x = -0.35;
-  windshield.material = glassMat;
-  windshield.parent = root;
-
-  // Ventana trasera
-  const rearWindow = BABYLON.MeshBuilder.CreatePlane("carRearWindow", { width: 1.4, height: 0.42 }, scene);
-  rearWindow.position.set(0, 1.05, -1.15);
-  rearWindow.rotation.x = 0.35;
-  rearWindow.material = glassMat;
-  rearWindow.parent = root;
-
-  // Ventanas laterales
-  const sideWindowL = BABYLON.MeshBuilder.CreatePlane("carSideWindowL", { width: 1.6, height: 0.38 }, scene);
-  sideWindowL.position.set(-0.76, 1.05, -0.15);
-  sideWindowL.rotation.y = Math.PI / 2;
-  sideWindowL.material = glassMat;
-  sideWindowL.parent = root;
-
-  const sideWindowR = BABYLON.MeshBuilder.CreatePlane("carSideWindowR", { width: 1.6, height: 0.38 }, scene);
-  sideWindowR.position.set(0.76, 1.05, -0.15);
-  sideWindowR.rotation.y = -Math.PI / 2;
-  sideWindowR.material = glassMat;
-  sideWindowR.parent = root;
-
-  // Ruedas más detalladas
-  const wheelMat = new BABYLON.StandardMaterial("carWheel_" + x + "_" + z, scene);
-  wheelMat.diffuseColor = BABYLON.Color3.FromHexString("#1a1a1a");
-  
-  const rimMat = new BABYLON.StandardMaterial("carRim_" + x + "_" + z, scene);
-  rimMat.diffuseColor = BABYLON.Color3.FromHexString("#c0c0c0");
-  rimMat.specularColor = new BABYLON.Color3(0.6, 0.6, 0.6);
-
-  [[-0.8, 0.28, 1.2], [0.8, 0.28, 1.2], [-0.8, 0.28, -1.2], [0.8, 0.28, -1.2]].forEach(([wx, wy, wz], i) => {
-    // Neumático
-    const wheel = BABYLON.MeshBuilder.CreateCylinder("carWheel" + i, { height: 0.18, diameter: 0.56, tessellation: 16 }, scene);
-    wheel.position.set(wx, wy, wz);
-    wheel.rotation.z = Math.PI / 2;
-    wheel.material = wheelMat;
-    wheel.parent = root;
-    
-    // Llanta
-    const rim = BABYLON.MeshBuilder.CreateCylinder("carRim" + i, { height: 0.19, diameter: 0.32, tessellation: 8 }, scene);
-    rim.position.set(wx, wy, wz);
-    rim.rotation.z = Math.PI / 2;
-    rim.material = rimMat;
-    rim.parent = root;
-  });
-
-  // Faros delanteros
-  const lightMat = new BABYLON.StandardMaterial("carLight_" + x + "_" + z, scene);
-  lightMat.diffuseColor = BABYLON.Color3.FromHexString("#fff8dc");
-  lightMat.emissiveColor = BABYLON.Color3.FromHexString("#606040");
-
-  [[-0.6, 0.52, 1.92], [0.6, 0.52, 1.92]].forEach(([lx, ly, lz], i) => {
-    const light = BABYLON.MeshBuilder.CreateSphere("carLight" + i, { diameter: 0.2, segments: 8 }, scene);
-    light.position.set(lx, ly, lz);
-    light.material = lightMat;
-    light.parent = root;
-  });
-
-  // Luces traseras
-  const tailLightMat = new BABYLON.StandardMaterial("carTailLight_" + x + "_" + z, scene);
-  tailLightMat.diffuseColor = BABYLON.Color3.FromHexString("#ff3333");
-  tailLightMat.emissiveColor = BABYLON.Color3.FromHexString("#801010");
-
-  [[-0.6, 0.52, -1.92], [0.6, 0.52, -1.92]].forEach(([lx, ly, lz], i) => {
-    const light = BABYLON.MeshBuilder.CreateBox("carTailLight" + i, { width: 0.18, height: 0.12, depth: 0.04 }, scene);
-    light.position.set(lx, ly, lz);
-    light.material = tailLightMat;
-    light.parent = root;
-  });
-
-  // Parachoques
-  const bumperMat = new BABYLON.StandardMaterial("carBumper_" + x + "_" + z, scene);
-  bumperMat.diffuseColor = BABYLON.Color3.FromHexString("#2a2a2a");
-
-  const frontBumper = BABYLON.MeshBuilder.CreateBox("carFrontBumper", { width: 1.7, height: 0.15, depth: 0.12 }, scene);
-  frontBumper.position.set(0, 0.3, 1.95);
-  frontBumper.material = bumperMat;
-  frontBumper.parent = root;
-
-  const rearBumper = BABYLON.MeshBuilder.CreateBox("carRearBumper", { width: 1.7, height: 0.15, depth: 0.12 }, scene);
-  rearBumper.position.set(0, 0.3, -1.95);
-  rearBumper.material = bumperMat;
-  rearBumper.parent = root;
-
-  // Matrícula
-  const plateMat = new BABYLON.StandardMaterial("carPlate_" + x + "_" + z, scene);
-  plateMat.diffuseColor = BABYLON.Color3.FromHexString("#f8f8f8");
-  
-  const frontPlate = BABYLON.MeshBuilder.CreateBox("carFrontPlate", { width: 0.5, height: 0.12, depth: 0.02 }, scene);
-  frontPlate.position.set(0, 0.38, 1.96);
-  frontPlate.material = plateMat;
-  frontPlate.parent = root;
+  if (shadowCasterFn) {
+    glbRoot.getChildMeshes().forEach(function(m) { shadowCasterFn(m); });
+  }
 
   return root;
 }
@@ -934,7 +965,7 @@ function initLivingWorld(scene, shadowCasterFn, canOccupyFn) {
   createDog(scene, shadowCasterFn, -8, -12);
   createDog(scene, shadowCasterFn, 12, 8);
 
-  // Crear gatos
+  // Crear gatos (procedurales)
   createCat(scene, shadowCasterFn, -5, 15);
   createCat(scene, shadowCasterFn, 18, -8);
   createCat(scene, shadowCasterFn, -20, -5);
@@ -971,3 +1002,7 @@ function updateLivingWorld(dt, heroPos) {
   updatePedestrians(dt, heroPos);
   updateAnimals(dt, heroPos);
 }
+
+window.loadWorldAssets = loadWorldAssets;
+window.initLivingWorld = initLivingWorld;
+window.updateLivingWorld = updateLivingWorld;

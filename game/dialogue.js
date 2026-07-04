@@ -31,11 +31,140 @@ const rewardEffects = {
   tiramisu: { desc: "Tiramisù: puntos dobles en próxima misión", apply: () => { state.activeEffects.doublePoints = true; } }
 };
 
+// --- Sistema de Progresión de Niveles (B1/B2/B3) ---------------------------
+function getMissionLevel(mission) {
+  if (!mission) return 1;
+  const savedLvl = state.missionLevels[mission.id] || 1;
+  const maxLvl = maxAuthoredLevel(mission);
+  return Math.min(savedLvl, maxLvl);
+}
+
+function maxAuthoredLevel(mission) {
+  if (!mission) return 1;
+  let maxLvl = 1;
+  if (mission.progression && Array.isArray(mission.progression)) {
+    maxLvl += mission.progression.length;
+  }
+  return Math.min(maxLvl, 4);
+}
+
+function getMissionContent(mission, level) {
+  if (!mission) return null;
+  
+  const baseGreeting = mission.greeting || { it: "Ciao! Vuoi fare una missione?", es: "¡Hola! ¿Quieres hacer una misión?" };
+  
+  if (level <= 1 || !mission.progression || !Array.isArray(mission.progression) || mission.progression.length === 0) {
+    return {
+      greeting: baseGreeting,
+      vocab: mission.vocab || [],
+      dialogue: mission.dialogue || [],
+      success: mission.success || "Bravo!",
+      failure: mission.failure || "Ritenta!",
+      reward: mission.reward || null
+    };
+  }
+  
+  const progIdx = Math.min(level - 2, mission.progression.length - 1);
+  const prog = mission.progression[progIdx] || {};
+  
+  return {
+    greeting: prog.greeting || baseGreeting,
+    vocab: prog.vocab || mission.vocab || [],
+    dialogue: prog.dialogue || mission.dialogue || [],
+    success: prog.success || mission.success || "Bravo!",
+    failure: prog.failure || mission.failure || "Ritenta!",
+    reward: prog.reward || mission.reward || null
+  };
+}
+
 let dialogueTranslationsVisible = false;
 let currentInteractionAudioTexts = [];
 let dialogueAutoSpeechTimer = null;
 
 const exactTranslations = {
+  // Saludos base
+  "Buongiorno! Benvenuto al Caffè della Piazza. Cosa posso portarti oggi?": "¡Buenos días! Bienvenido al Café de la Plaza. ¿Qué puedo traerte hoy?",
+  "Buongiorno! Pane fresco, focaccia calda e dolci appena sfornati. Cosa posso darti?": "¡Buenos días! Pan fresco, focaccia caliente y dulces recién horneados. ¿Qué puedo darte?",
+
+  // Caffe - Nivel 2
+  "Buongiorno! Di nuovo qui? Cosa desidera oggi?": "¡Buenos días! ¿De nuevo por aquí? ¿Qué desea hoy?",
+  "Buongiorno! Di nuevo qui? Cosa desidera oggi?": "¡Buenos días! ¿De nuevo por aquí? ¿Qué desea hoy?",
+  "Dammi un caffè, per favore.": "Dame un café, por favor.",
+
+  // Caffe - Nivel 3
+  "Buongiorno! Ormai sei un cliente fisso! Cosa ti preparo?": "¡Buenos días! ¡Ya eres un cliente habitual! ¿Qué te preparo?",
+  "Vorrei un espresso, per favore.": "Quisiera un espresso, por favor.",
+  "Desidero un espresso, per piacere.": "Deseo un espresso, por favor.",
+  "Voglio un espresso, per favore.": "Quiero un espresso, por favor.",
+  "Al tavolo o al banco?": "¿En la mesa o en la barra?",
+  "Al banco, grazie.": "En la barra, gracias.",
+  "In barra, grazie.": "En la barra, gracias.",
+  "Al tavolo, per favore.": "En la mesa, por favor.",
+  "Perfetto, ecco il caffè. Vuole lo scontrino?": "Perfecto, aquí está el café. ¿Quiere el recibo?",
+  "Ecco il caffè. Vuole lo scontrino?": "Aquí está el café. ¿Quiere el recibo?",
+  "Sì, grazie. Lo scontrino, per favore.": "Sí, gracias. El recibo, por favor.",
+  "Sì, grazie. La ricevuta, per favore.": "Sí, gracias. El recibo, por favor.",
+  "No, grazie. Va bene così.": "No, gracias. Así está bien.",
+  "Ecco a Lei! Buona giornata!": "Aquí tiene. ¡Buen día!",
+
+  // Caffe - Nivel 4
+  "Ciao! Il solito caffè o vuoi provare qualcosa di nuovo?": "¡Hola! ¿El café de siempre o quieres probar algo nuevo?",
+  "Vorrei provare il ginseng, se possibile.": "Quisiera probar el ginseng, si es posible.",
+  "Voglio provare il ginseng, per piacere.": "Quiero probar el ginseng, por favor.",
+  "Desidero provare il ginseng, per favore.": "Deseo probar el ginseng, por favor.",
+  "In tazza grande o pequeña?": "¿En taza grande o pequeña?",
+  "In tazza grande o piccola?": "¿En taza grande o pequeña?",
+  "In tazza piccola, grazie.": "En taza pequeña, gracias.",
+  "En taza chica, per favore.": "En taza chica, por favor.",
+  "Tazza grande, grazie.": "Taza grande, gracias.",
+  "D'accordo! Gradisce dello zucchero o del miele?": "¡De acuerdo! ¿Desea azúcar o miel?",
+  "Zucchero di canna, per favore.": "Azúcar moreno, por favor.",
+  "Zucchero del cane, per favore.": "Azúcar del perro, por favor.",
+  "Miele del cane, per piacere.": "Miel del perro, por favor.",
+  "Sono tre euro in totale.": "Son tres euros en total.",
+  "Ecco a Lei. Tenga il resto!": "Aquí tiene. ¡Quédese con el cambio!",
+  "Ecco a te. Tenga il resto!": "Aquí tienes. ¡Quédese con el cambio!",
+  "Ecco a Lei. Tenga la mancia!": "Aquí tiene. ¡Quédese con la propina!",
+  "Molto gentile! Buona giornata!": "¡Muy amable! ¡Buen día!",
+
+  // Panetteria - Nivel 2
+  "Buongiorno! Di cosa ha bisogno oggi? Abbiamo dell'ottima focaccia.": "¡Buenos días! ¿Qué necesita hoy? Tenemos una focaccia excelente.",
+  "Buongiorno! Di cosa ha bisogno oggi?": "¡Buenos días! ¿Qué necesita hoy?",
+  "Vorrei due cornetti alla crema, per favore.": "Quisiera dos croissants de crema, por favor.",
+  "Desidero due cornetti alla crema, per piacere.": "Deseo dos croissants de crema, por favor.",
+  "Voglio due cornetti alla crema, per favore.": "Quiero dos croissants de crema, por favor.",
+  "Ecco i suoi cornetti! Desidera altro?": "¡Aquí están sus croissants! ¿Desea algo más?",
+
+  // Panetteria - Nivel 3
+  "Ciao! Vuoi il solito pane o prendi qualcosa di dolce?": "¡Hola! ¿Quieres el pan de siempre o te llevas algo dulce?",
+  "Ciao! Vuoi el solito pane o prendi qualcosa di dolce?": "¡Hola! ¿Quieres el pan de siempre o te llevas algo dulce?",
+  "Ciao! Vuoi il solito pane o prendi something di dolce?": "¡Hola! ¿Quieres el pan de siempre o te llevas algo dulce?",
+  "Vorrei una ciabatta ben cotta, per favore.": "Quisiera una ciabatta bien hecha, por favor.",
+  "Voglio una ciabatta ben cucinata, per piacere.": "Quiero una ciabatta bien hecha, por favor.",
+  "Desidero una ciabatta ben fatta, per favore.": "Deseo una ciabatta bien hecha, por favor.",
+  "Certo! Gradisce anche dei grissini?": "¡Claro! ¿Desea también colines?",
+  "Sì, una confezione di grissini torinesi, grazie.": "Sí, un paquete de colines turineses, gracias.",
+  "Sì, una scatola de grissini torinesi, grazie.": "Sí, un paquete de colines turineses, gracias.",
+  "Sì, un pacchetto de grissini torinesi, per favore.": "Sí, un paquete de colines turineses, por favor.",
+  "Molto bene. Ecco a te!": "¡Muy bien. ¡Aquí tienes!",
+
+  // Panetteria - Nivel 4
+  "Salve! Oggi abbiamo una specialità: focaccia di Recco. Ne vuole una porzione?": "¡Hola! Hoy tenemos una especialidad: focaccia de Recco. ¿Quiere una porción?",
+  "Salve! Oggi abbiamo la focaccia di Recco. Ne vuole una porzione?": "¡Hola! Hoy tenemos la focaccia de Recco. ¿Quiere una porción?",
+  "Sì, volentieri! Una porzione, grazie.": "¡Sí, con gusto! Una porción, gracias.",
+  "Sì, con piacere! Un pezzo, per favore.": "¡Sí, con gusto! Un trozo, por favor.",
+  "Sì, grazie! La voglio provar.": "¡Sí, gracias! La quiero probar.",
+  "La riscaldo un momento?": "¿Se la caliento un momento?",
+  "Sì, grazie, calda è molto meglio.": "Sí, gracias, caliente está mucho mejor.",
+  "Sì, gracias, caliente è molto meglio.": "Sí, gracias, caliente está mucho mejor.",
+  "Sì, grazie, calorosa è molto meglio.": "Sí, gracias, caliente está mucho mejor.",
+  "Ecco a Lei! Calda e filante. Sono cinque euro.": "¡Aquí tiene! Caliente y fundente. Son cinco euros.",
+  "Sono cinque euro.": "Son cinco euros.",
+  "Pago con una banconota da dieci euro. Ecco a Lei.": "Pago con un billete de diez euros. Aquí tiene.",
+  "Pago con un biglietto da dieci euro. Ecco a Lei.": "Pago con un billete de diez euros. Aquí tiene.",
+  "Pago con carta di credito, grazie.": "Pago con tarjeta de crédito, gracias.",
+  "Ecco il resto e lo scontrino. Arrivederci!": "Aquí tiene el cambio y el recibo. ¡Hasta la vista!",
+
   "Buongiorno! Cosa desidera?": "¡Buenos días! ¿Qué desea?",
   "Vorrei un caffè, per favore.": "Quisiera un café, por favor.",
   "Voglio un caffè, per piacere.": "Quiero un café, por favor.",
@@ -640,8 +769,13 @@ function openDialogue(mission) {
   const optionsContainer = document.getElementById("dialogue-options");
   const feedbackPanel = document.getElementById("dialogue-feedback");
 
+  const lvl = getMissionLevel(mission);
+  const content = getMissionContent(mission, lvl);
+  state.activeMissionContent = content; // cache resolved content for this session
+
   speaker.textContent = mission.npc;
-  speakerRole.textContent = `${mission.place} (${mission.level})`;
+  // Badge de Nivel (B3)
+  speakerRole.textContent = `${mission.place} (${mission.level}) · Livello ${lvl}`;
   avatarChar.textContent = mission.npc ? mission.npc.charAt(0) : "G";
 
   feedbackPanel.style.display = "none";
@@ -649,12 +783,20 @@ function openDialogue(mission) {
   dialogueTranslationsVisible = false;
   setupDialogueHeaderTools();
 
-  if (mission.vocab && mission.vocab.length > 0) {
+  if (content.vocab && content.vocab.length > 0) {
     state.inVocabPhase = true;
-    currentInteractionAudioTexts = mission.vocab.map(v => v.it);
+    
+    // Autoplay al abrir is ONLY the greeting! "▶ Todo" plays both greeting + vocabulary sequence
+    currentInteractionAudioTexts = [content.greeting.it, ...content.vocab.map(v => v.it)];
+    
     const speakDialogueBtn = document.getElementById("speakDialogueBtn");
     const translateDialogueBtn = document.getElementById("translateDialogueBtn");
-    if (speakDialogueBtn) speakDialogueBtn.style.display = "none";
+    if (speakDialogueBtn) {
+      speakDialogueBtn.style.display = "flex";
+      speakDialogueBtn.onclick = () => {
+        window.speakItalian(content.greeting.it);
+      };
+    }
     if (translateDialogueBtn) {
       translateDialogueBtn.style.display = "inline-flex";
       translateDialogueBtn.classList.toggle("active", dialogueTranslationsVisible);
@@ -663,9 +805,33 @@ function openDialogue(mission) {
     }
 
     const vocabVisibleClass = dialogueTranslationsVisible ? " visible" : "";
-    let vocabHtml = `<div style="margin-bottom: 12px; font-weight: bold; color: #f2b84b; font-size: 16px;">Vocabolario della missione:</div><div style="max-height: 180px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px;">`;
-    mission.vocab.forEach(v => {
-      vocabHtml += `<div style="margin-bottom: 8px; font-size: 15px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;"><span style="color: #4cd964; font-weight: bold; cursor: pointer; background: rgba(76, 217, 100, 0.15); padding: 4px 10px; border-radius: 6px; font-size: 13.5px;" onclick="window.speakItalian('${v.it.replace(/'/g, "\\'")}')">🔊 ${escapeHtml(v.it)}</span><span class="translation-line${vocabVisibleClass}" style="margin-top: 0;">— ${escapeHtml(v.es)}</span></div>`;
+    
+    let html = "";
+    
+    // 1. Saludo/Oferta del NPC (B2)
+    html += `
+      <div class="npc-greeting-block" style="margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid rgba(248, 241, 223, 0.12);">
+        <div style="font-size: 14.5px; font-weight: bold; color: #f2b84b; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+          <span style="cursor: pointer; background: rgba(242, 184, 75, 0.15); padding: 3px 9px; border-radius: 6px; font-size: 12px; color: #f2b84b;" onclick="window.speakItalian('${content.greeting.it.replace(/'/g, "\\'")}')">🔊 Escuchar</span>
+          <span>Presentación:</span>
+        </div>
+        <div style="font-size: 15px; line-height: 1.5; color: #f8f1df;">
+          "${escapeHtml(content.greeting.it)}"
+        </div>
+        <div class="translation-line${vocabVisibleClass}" style="margin-top: 5px; font-style: italic; color: #a69886; font-size: 14px;">
+          "${escapeHtml(content.greeting.es)}"
+        </div>
+      </div>
+    `;
+
+    // 2. Vocabulario de Misión
+    html += `
+      <div style="margin-bottom: 10px; font-weight: bold; color: #f2b84b; font-size: 14.5px;">Vocabolario della missione:</div>
+      <div style="max-height: 150px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px;">
+    `;
+    
+    content.vocab.forEach(v => {
+      html += `<div style="margin-bottom: 8px; font-size: 15px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;"><span style="color: #4cd964; font-weight: bold; cursor: pointer; background: rgba(76, 217, 100, 0.15); padding: 4px 10px; border-radius: 6px; font-size: 13.5px;" onclick="window.speakItalian('${v.it.replace(/'/g, "\\'")}')">🔊 ${escapeHtml(v.it)}</span><span class="translation-line${vocabVisibleClass}" style="margin-top: 0;">— ${escapeHtml(v.es)}</span></div>`;
 
       const key = v.it.toLowerCase();
       if (!state.vocabTracking[key]) {
@@ -680,8 +846,8 @@ function openDialogue(mission) {
         };
       }
     });
-    vocabHtml += `</div>`;
-    dialogueText.innerHTML = vocabHtml;
+    html += `</div>`;
+    dialogueText.innerHTML = html;
 
     optionsContainer.innerHTML = "";
     const beginBtn = document.createElement("button");
@@ -696,7 +862,9 @@ function openDialogue(mission) {
       showDialogueStep();
     };
     optionsContainer.appendChild(beginBtn);
-    queueCurrentInteractionAudio();
+    
+    // Autoplay ONLY greeting
+    queueCurrentInteractionAudio([content.greeting.it]);
   } else {
     showDialogueStep();
   }
@@ -704,7 +872,8 @@ function openDialogue(mission) {
 
 function showDialogueStep() {
   const mission = state.activeMission;
-  const step = mission.dialogue[state.dialogueTurn];
+  const content = state.activeMissionContent || getMissionContent(mission, getMissionLevel(mission));
+  const step = content.dialogue[state.dialogueTurn];
 
   const dialogueText = document.getElementById("dialogue-text");
   const optionsContainer = document.getElementById("dialogue-options");
@@ -784,7 +953,8 @@ function showDialogueStep() {
 
 function answerMission(choiceIndex) {
   const mission = state.activeMission;
-  const step = mission.dialogue[state.dialogueTurn];
+  const content = state.activeMissionContent || getMissionContent(mission, getMissionLevel(mission));
+  const step = content.dialogue[state.dialogueTurn];
   const isCorrect = choiceIndex === step.correct;
 
   const feedbackPanel = document.getElementById("dialogue-feedback");
@@ -802,8 +972,8 @@ function answerMission(choiceIndex) {
   state.learningMetrics[levelKey].byType = state.learningMetrics[levelKey].byType || {};
   if (mission.skill) state.learningMetrics[levelKey].bySkill[mission.skill] = (state.learningMetrics[levelKey].bySkill[mission.skill] || 0) + 1;
 
-  if (mission.vocab) {
-    mission.vocab.forEach(v => {
+  if (content.vocab) {
+    content.vocab.forEach(v => {
       const key = v.it.toLowerCase();
       if (state.vocabTracking[key]) {
         state.vocabTracking[key].attempts++;
@@ -829,7 +999,7 @@ function answerMission(choiceIndex) {
     feedbackTitle.textContent = "¡Correcto!";
 
     const nextTurn = state.dialogueTurn + 1;
-    if (nextTurn < mission.dialogue.length) {
+    if (nextTurn < content.dialogue.length) {
       state.dialogueTurn = nextTurn;
       currentInteractionAudioTexts = [fillPlayerName(step.successLine)];
       explanationText.innerHTML = `<div class="feedback-summary">
@@ -855,22 +1025,28 @@ function answerMission(choiceIndex) {
         showDialogueStep();
       };
     } else {
-      let pts = mission.reward?.points || 15;
+      let pts = content.reward?.points || 15;
       if (state.activeEffects.doublePoints) { pts *= 2; state.activeEffects.doublePoints = false; }
       state.score += pts;
       state.energy = Math.min(100, state.energy + 8);
+      
+      // Subida de Nivel de Misión al completar con éxito (B1)
+      const currentLvl = getMissionLevel(mission);
+      const maxLvl = maxAuthoredLevel(mission);
+      state.missionLevels[mission.id] = Math.min(currentLvl + 1, maxLvl);
       state.completed[mission.id] = true;
+      window.saveState(); // Guardar el estado tras completar
 
-      let rewardHtml = `<strong>${mission.success}</strong><br><br>+${pts} Puntos, +8 Energía.`;
-      if (mission.reward && mission.reward.name) {
-        const rid = mission.reward.name.toLowerCase().replace(/\s+/g, "");
+      let rewardHtml = `<strong>${content.success}</strong><br><br>+${pts} Puntos, +8 Energía.`;
+      if (content.reward && content.reward.name) {
+        const rid = content.reward.name.toLowerCase().replace(/\s+/g, "");
         if (rewardEffects[rid]) {
           rewardEffects[rid].apply();
           rewardHtml += `<br><span style="color: #4cd964;">🎁 ${rewardEffects[rid].desc}</span>`;
         }
       }
       explanationText.innerHTML = rewardHtml;
-      currentInteractionAudioTexts = [fillPlayerName(mission.success)];
+      currentInteractionAudioTexts = [fillPlayerName(content.success)];
       
       const speakFeedbackBtn = document.getElementById("speakFeedbackBtn");
       if (speakFeedbackBtn) speakFeedbackBtn.style.display = "none";

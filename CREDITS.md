@@ -88,6 +88,31 @@ El sistema de música procedural (Web Audio API) es código original del proyect
 
 ---
 
+## Personajes 3D
+
+### Quaternius — Universal Base Characters / Modular Character Outfits
+- **Autor:** Quaternius (https://quaternius.com · https://quaternius.itch.io)
+- **Uso:** modelos base de personaje (cuerpos M/F) y trajes modulares en `game/models/characters/`
+- **Licencia:** CC0 (dominio público) — atribución no obligatoria, incluida por cortesía
+
+### Kenney — Mini Characters / Car Kit
+- **Autor:** Kenney (https://kenney.nl)
+- **Uso:** 12 personajes civiles (`characters/kenney-mini-people/`) + 14 vehículos
+  (`vehicles/kenney-car-kit/`: sedan, taxi, van, suv, police…)
+- **Licencia:** CC0 1.0 — atribución no obligatoria, incluida por cortesía
+
+### Poly Pizza — animales
+- **Fuente:** https://poly.pizza (modelos CC0 de varios autores)
+- **Uso:** animales en `game/models/animals/` (paloma, perros —Shiba/Husky animados—, gaviota, gallina)
+- **Licencia:** CC0 — atribución no obligatoria, incluida por cortesía
+
+### HVGirl
+- **Fuente:** Babylon.js assets (`assets.babylonjs.com/meshes/HVGirl.glb`)
+- **Uso:** modelo del jugador y de los NPCs (actual)
+- **Licencia:** CC-BY 4.0
+
+---
+
 ## Desarrollo
 
 ### Equipo

@@ -655,7 +655,7 @@
       <h1>Motor Babylon.js</h1>
       <p>
         <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> moverse ·
-        <kbd>Shift</kbd> correr · <kbd>Space</kbd> saltar · <kbd>Ctrl</kbd> agacharse · <kbd>V</kbd> cambiar vista · arrastra para girar.
+        <kbd>Shift</kbd> correr · <kbd>Space</kbd> saltar · <kbd>Ctrl</kbd> agacharse · <kbd>V</kbd> cambiar vista · <kbd>F</kbd>/<kbd>1</kbd>-<kbd>4</kbd> emotes · arrastra para girar.
       </p>
     </div>
 
@@ -677,6 +677,14 @@
     </div>
 
     <div id="touchPad" aria-hidden="true"><div id="touchNub"></div></div>
+
+    <!-- Panel de Emotes (A5) -->
+    <div id="emotesPanel" class="overlay" style="right: 14px; top: 110px; display: flex; flex-direction: column; gap: 6px; pointer-events: auto;">
+      <button class="emote-btn" data-emote="wave" style="font:inherit; font-size:12px; font-weight:700; cursor:pointer; color:#d8cdb8; background:rgba(0,0,0,0.42); border:1px solid rgba(248,241,223,0.22); border-radius:8px; padding:7px 11px; backdrop-filter:blur(4px); transition:all .15s; outline:none;" title="Saludar">👋 Saludar</button>
+      <button class="emote-btn" data-emote="yes" style="font:inherit; font-size:12px; font-weight:700; cursor:pointer; color:#d8cdb8; background:rgba(0,0,0,0.42); border:1px solid rgba(248,241,223,0.22); border-radius:8px; padding:7px 11px; backdrop-filter:blur(4px); transition:all .15s; outline:none;" title="Asentir">✔️ Asentir</button>
+      <button class="emote-btn" data-emote="no" style="font:inherit; font-size:12px; font-weight:700; cursor:pointer; color:#d8cdb8; background:rgba(0,0,0,0.42); border:1px solid rgba(248,241,223,0.22); border-radius:8px; padding:7px 11px; backdrop-filter:blur(4px); transition:all .15s; outline:none;" title="Negar">❌ Negar</button>
+      <button class="emote-btn" data-emote="cheer" style="font:inherit; font-size:12px; font-weight:700; cursor:pointer; color:#d8cdb8; background:rgba(0,0,0,0.42); border:1px solid rgba(248,241,223,0.22); border-radius:8px; padding:7px 11px; backdrop-filter:blur(4px); transition:all .15s; outline:none;" title="Celebrar">🎉 Festejar</button>
+    </div>
 
     <!-- Overlay del selector de música: fondo clicable para cerrar (regla F1) -->
     <div id="musicSelectorOverlay" style="display:none; position:fixed; inset:0; z-index:199; background:rgba(0,0,0,0.4);"></div>
@@ -779,13 +787,13 @@
       })();
     </script>
     <script src="data/curriculum.js" defer></script>
-    <script src="data/missions.js" defer></script>
+    <script src="data/missions.js?v=2" defer></script>
     <script src="audio/audio.js?v=4" defer></script>
-    <script src="game/state.js?v=34" defer></script>
-    <script src="game/character.js?v=2" defer></script>
-    <script src="game/dialogue.js?v=38" defer></script>
-    <script src="game/npcLoader.js?v=5" defer></script>
-    <script src="game/world.js?v=3" defer></script>
-    <script src="game.js?v=38" defer></script>
+    <script src="game/state.js?v=35" defer></script>
+    <script src="game/character.js?v=3" defer></script>
+    <script src="game/dialogue.js?v=39" defer></script>
+    <script src="game/npcLoader.js?v=6" defer></script>
+    <script src="game/world.js?v=4" defer></script>
+    <script src="game.js?v=40" defer></script>
   </body>
 </html>

@@ -36,9 +36,28 @@ const state = {
   shoeStyle: "sneakers",
   topColor: "#5fa6a7",
   pantsColor: "#2f3740",
-  shoeColor: "#3a2b25"
+  shoeColor: "#3a2b25",
+  playerModel: "female-a",
+  missionLevels: {}
 };
 window.state = state;
+
+// --- Registro de Modelos de Personaje (Kenney Mini) -------------------------
+const CHARACTER_MODELS = {
+  "female-a": { name: "Sofia", file: "character-female-a.glb", gender: "female" },
+  "female-b": { name: "Livia", file: "character-female-b.glb", gender: "female" },
+  "female-c": { name: "Elena", file: "character-female-c.glb", gender: "female" },
+  "female-d": { name: "Giulia", file: "character-female-d.glb", gender: "female" },
+  "female-e": { name: "Alba", file: "character-female-e.glb", gender: "female" },
+  "female-f": { name: "Anna", file: "character-female-f.glb", gender: "female" },
+  "male-a": { name: "Marco", file: "character-male-a.glb", gender: "male" },
+  "male-b": { name: "Toni", file: "character-male-b.glb", gender: "male" },
+  "male-c": { name: "Ricci", file: "character-male-c.glb", gender: "male" },
+  "male-d": { name: "Paolo", file: "character-male-d.glb", gender: "male" },
+  "male-e": { name: "Nico", file: "character-male-e.glb", gender: "male" },
+  "male-f": { name: "Mario", file: "character-male-f.glb", gender: "male" }
+};
+window.CHARACTER_MODELS = CHARACTER_MODELS;
 
 function saveState() {
   localStorage.setItem("italgame_state_v1", JSON.stringify(state));
@@ -80,6 +99,8 @@ function loadState() {
       if (parsed.topColor) state.topColor = parsed.topColor;
       if (parsed.pantsColor) state.pantsColor = parsed.pantsColor;
       if (parsed.shoeColor) state.shoeColor = parsed.shoeColor;
+      if (parsed.playerModel) state.playerModel = parsed.playerModel;
+      if (parsed.missionLevels) state.missionLevels = parsed.missionLevels;
     }
   } catch (e) {
     console.error("Error al cargar el estado:", e);

@@ -13,6 +13,10 @@ const missions = [
     communicativeFunction: "ordering",
     errorTypes: ["formality", "interference"],
     prerequisites: [],
+    greeting: {
+      it: "Buongiorno! Benvenuto al Caffè della Piazza. Cosa posso portarti oggi?",
+      es: "¡Buenos días! Bienvenido al Café de la Plaza. ¿Qué puedo traerte hoy?"
+    },
     vocab: [
       { it: "Buongiorno", es: "Buenos dias" },
       { it: "Vorrei", es: "Quisiera" },
@@ -49,10 +53,129 @@ const missions = [
         failureLine: "Come dice?"
       }
     ],
-    success: "Sofia prepara un caffè perfetto. Ti senti il benvenuto in Italia.",
+    success: "Sofia prepara un caffè perfetto. Ti senti el benvenuto in Italia.",
     failure: "Sofia cerca di capirti ma l'ordine esce confuso.",
     reward: { name: "Caffe", points: 15, color: "#6b3e1e" },
-    failEvent: "badFood"
+    failEvent: "badFood",
+    progression: [
+      {
+        // Nivel 2
+        greeting: {
+          it: "Buongiorno! Di nuovo qui? Cosa desidera oggi?",
+          es: "¡Buenos días! ¿De nuevo por aquí? ¿Qué desea hoy?"
+        },
+        dialogue: [
+          {
+            prompt: "Buongiorno! Di nuevo qui? Cosa desidera oggi?",
+            hint: "La barista te saluda formalmente y pregunta qué deseas hoy.",
+            choices: ["Vorrei un caffè, per favore.", "Voglio un caffè, per piacere.", "Dammi un caffè, per favore."],
+            correct: 0,
+            explanation: "'Vorrei' es el condicional de cortesía adecuado. 'Dammi' (dame) es demasiado informal.",
+            successLine: "Benissimo! Lungo o ristretto?",
+            failureLine: "Scusi... non ho capito bene."
+          },
+          {
+            prompt: "Lungo o ristretto?",
+            hint: "Pregunta si lo quieres largo o corto.",
+            choices: ["Ristretto, grazie.", "Corto, grazie.", "Piccolo, per favore."],
+            correct: 0,
+            explanation: "'Ristretto' es el término italiano para café concentrado.",
+            successLine: "Perfetto! Vuole anche un cornetto?",
+            failureLine: "Mmm... non è proprio così."
+          },
+          {
+            prompt: "Sono due euro e cinquanta.",
+            hint: "Te dice el precio: 2.50 euros.",
+            choices: ["Ecco a Lei. Grazie!", "Ecco a te. Grazie!", "Ecco a Lei. Grazia!"],
+            correct: 0,
+            explanation: "'Ecco a Lei' es la cortesía formal para 'aquí tiene'.",
+            successLine: "Grazie a Lei! Buona giornata!",
+            failureLine: "Come dice?"
+          }
+        ]
+      },
+      {
+        // Nivel 3
+        greeting: {
+          it: "Buongiorno! Ormai sei un cliente fisso! Cosa ti preparo?",
+          es: "¡Buenos días! ¡Ya eres un cliente habitual! ¿Qué te preparo?"
+        },
+        dialogue: [
+          {
+            prompt: "Buongiorno! Ormai sei un cliente fisso! Cosa ti preparo?",
+            hint: "Usa registro informal porque ya te conoce. Responde con cortesía.",
+            choices: ["Vorrei un espresso, per favore.", "Desidero un espresso, per piacere.", "Voglio un espresso, per favore."],
+            correct: 0,
+            explanation: "'Vorrei' sigue siendo la opción más educada.",
+            successLine: "Ottimo! Al tavolo o al banco?",
+            failureLine: "Prego?"
+          },
+          {
+            prompt: "Al tavolo o al banco?",
+            hint: "Pregunta si lo tomas en mesa o en barra.",
+            choices: ["Al banco, grazie.", "In barra, grazie.", "Al tavolo, per favore."],
+            correct: 0,
+            explanation: "En barra es 'al banco' en italiano.",
+            successLine: "Perfetto, ecco il caffè. Vuole lo scontrino?",
+            failureLine: "Non capisco..."
+          },
+          {
+            prompt: "Ecco il caffè. Vuole lo scontrino?",
+            hint: "Te ofrece el recibo fiscal (scontrino).",
+            choices: ["Sì, grazie. Lo scontrino, per favore.", "Sì, grazie. La ricevuta, per favore.", "No, grazie. Va bene così."],
+            correct: 0,
+            explanation: "'Lo scontrino' es el recibo fiscal impreso comercial en cafeterías.",
+            successLine: "Ecco a Lei! Buona giornata!",
+            failureLine: "Scusi?"
+          }
+        ]
+      },
+      {
+        // Nivel 4
+        greeting: {
+          it: "Ciao! Il solito caffè o vuoi provare qualcosa di nuovo?",
+          es: "¡Hola! ¿El café de siempre o quieres probar algo nuevo?"
+        },
+        dialogue: [
+          {
+            prompt: "Ciao! Il solito caffè o vuoi provare qualcosa di nuovo?",
+            hint: "Te saluda de forma amigable y ofrece probar algo nuevo.",
+            choices: ["Vorrei provare il ginseng, se possibile.", "Voglio provare il ginseng, per piacere.", "Desidero provare il ginseng, per favore."],
+            correct: 0,
+            explanation: "El café al ginseng es una alternativa popular en Italia.",
+            successLine: "Ottima scelta! In tazza grande o piccola?",
+            failureLine: "Come?"
+          },
+          {
+            prompt: "In tazza grande o piccola?",
+            hint: "Pregunta si lo quieres en taza grande o pequeña.",
+            choices: ["In tazza piccola, grazie.", "En taza chica, per favore.", "Tazza grande, grazie."],
+            correct: 0,
+            explanation: "'In tazza piccola' es correcto para tamaño espresso.",
+            successLine: "D'accordo! Gradisce dello zucchero o del miele?",
+            failureLine: "Non capisco la dimensione..."
+          },
+          {
+            prompt: "Gradisce dello zucchero o del miele?",
+            hint: "Te ofrece endulzarlo con azúcar o miel.",
+            choices: ["Zucchero di canna, per favore.", "Zucchero del cane, per favore.", "Miele del cane, per piacere."],
+            correct: 0,
+            explanation: "'Zucchero di canna' (azúcar moreno) es la traducción correcta. 'Cane' es perro.",
+            successLine: "Perfetto. Sono tre euro in totale.",
+            failureLine: "Cosa desidera?"
+          },
+          {
+            prompt: "Sono tre euro in totale.",
+            hint: "Indica el total: 3 euros.",
+            choices: ["Ecco a Lei. Tenga il resto!", "Ecco a te. Tenga il resto!", "Ecco a Lei. Tenga la mancia!"],
+            correct: 0,
+            explanation: "'Tenga il resto' es la cortesía para quedarse con el cambio.",
+            successLine: "Molto gentile! Buona giornata!",
+            failureLine: "Non ho capito."
+          }
+        ]
+      }
+    ]
   },
   {
     id: "panetteria", level: "A1", place: "Panetteria", npc: "Fornaio Marco",
@@ -63,6 +186,10 @@ const missions = [
     communicativeFunction: "ordering",
     errorTypes: ["plural", "interference"],
     prerequisites: [],
+    greeting: {
+      it: "Buongiorno! Pane fresco, focaccia calda e dolci appena sfornati. Cosa posso darti?",
+      es: "¡Buenos días! Pan fresco, focaccia caliente y dulces recién horneados. ¿Qué puedo darte?"
+    },
     vocab: [
       { it: "Cornetti", es: "Croissants" },
       { it: "Quanti", es: "Cuantos" },
@@ -88,6 +215,102 @@ const missions = [
         explanation: "'Farciti' es el termino correcto para 'rellenos' en italiano.",
         successLine: "Ottima scelta! Sono appena sfornati.",
         failureLine: "Non abbiamo quel ripieno, mi dispiace."
+      }
+    ],
+    success: "Marco ti consegna un sacchetto caldo di cornetti appena sfornati.",
+    failure: "Marco mette una cipolla dolce nel sacchetto. Non era la colazione ideale.",
+    reward: { name: "Cornetto", points: 10, color: "#d9a03b" },
+    failEvent: "badFood",
+    progression: [
+      {
+        // Nivel 2
+        greeting: {
+          it: "Buongiorno! Di cosa ha bisogno oggi? Abbiamo dell'ottima focaccia.",
+          es: "¡Buenos días! ¿Qué necesita hoy? Tenemos una focaccia excelente."
+        },
+        dialogue: [
+          {
+            prompt: "Buongiorno! Di cosa ha bisogno oggi?",
+            hint: "El panadero te saluda formalmente y pregunta qué necesitas.",
+            choices: ["Vorrei due cornetti alla crema, per favore.", "Desidero due cornetti alla crema, per piacere.", "Voglio due cornetti alla crema, per favore."],
+            correct: 0,
+            explanation: "'Vorrei' es el condicional de cortesía educado.",
+            successLine: "Ecco i suoi cornetti! Desidera altro?",
+            failureLine: "Prego?"
+          },
+          {
+            prompt: "Li vuole farciti o vuoti?",
+            hint: "Pregunta si los quieres rellenos o vacíos.",
+            choices: ["Farciti, con crema.", "Relleni, con crema.", "Pieni, per favore."],
+            correct: 0,
+            explanation: "'Farciti' es el término italiano para rellenos.",
+            successLine: "Ottima scelta! Sono appena sfornati.",
+            failureLine: "Non ho capito..."
+          }
+        ]
+      },
+      {
+        // Nivel 3
+        greeting: {
+          it: "Ciao! Vuoi il solito pane o prendi qualcosa di dolce?",
+          es: "¡Hola! ¿Quieres el pan de siempre o te llevas algo dulce?"
+        },
+        dialogue: [
+          {
+            prompt: "Ciao! Vuoi il solito pane o prendi something di dolce?",
+            hint: "Te saluda amigablemente. Pide un pan tipo ciabatta crujiente.",
+            choices: ["Vorrei una ciabatta ben cotta, per favore.", "Voglio una ciabatta ben cucinata, per piacere.", "Desidero una ciabatta ben fatta, per favore."],
+            correct: 0,
+            explanation: "'Ciabatta' es pan crujiente. 'Ben cotta' (bien hecha/cocida) es lo correcto.",
+            successLine: "Certo! Gradisce anche dei grissini?",
+            failureLine: "Che tipo di pane?"
+          },
+          {
+            prompt: "Gradisce anche dei grissini?",
+            hint: "Te ofrece colines (grissini). Pide un paquete.",
+            choices: ["Sì, una confezione di grissini torinesi, grazie.", "Sì, una scatola de grissini torinesi, grazie.", "Sì, un pacchetto de grissini torinesi, per favore."],
+            correct: 0,
+            explanation: "'Una confezione' (paquete/envase comercial) es el término adecuado.",
+            successLine: "Molto bene. Ecco a te!",
+            failureLine: "Scusa?"
+          }
+        ]
+      },
+      {
+        // Nivel 4
+        greeting: {
+          it: "Salve! Oggi abbiamo una specialità: focaccia di Recco. Ne vuole una porzione?",
+          es: "¡Hola! Hoy tenemos una especialidad: focaccia de Recco. ¿Quiere una porción?"
+        },
+        dialogue: [
+          {
+            prompt: "Salve! Oggi abbiamo la focaccia di Recco. Ne vuole una porzione?",
+            hint: "Ofrece porción de focaccia de Recco. Acepta con gusto.",
+            choices: ["Sì, volentieri! Una porzione, grazie.", "Sì, con piacere! Un pezzo, per favore.", "Sì, grazie! La voglio provar."],
+            correct: 0,
+            explanation: "'Sì, volentieri!' es la frase idiomática ideal para aceptar con gusto.",
+            successLine: "Ottimo. La riscaldo un momento?",
+            failureLine: "Non ho capito bene se la vuole..."
+          },
+          {
+            prompt: "La riscaldo un momento?",
+            hint: "Pregunta si la calienta. Responde que sí.",
+            choices: ["Sì, grazie, calda è molto meglio.", "Sì, gracias, caliente è molto meglio.", "Sì, grazie, calorosa è molto meglio."],
+            correct: 0,
+            explanation: "'Calda' es caliente (femenino). Evita palabras españolas o impropias.",
+            successLine: "Ecco a Lei! Calda e filante. Sono cinque euro.",
+            failureLine: "Come dice?"
+          },
+          {
+            prompt: "Sono cinque euro.",
+            hint: "Indica el total: 5 euros. Paga con billete de 10.",
+            choices: ["Pago con una banconota da dieci euro. Ecco a Lei.", "Pago con un biglietto da dieci euro. Ecco a Lei.", "Pago con carta di credito, grazie."],
+            correct: 0,
+            explanation: "Billete de dinero es 'banconota' (no 'biglietto', que es de transporte/cine).",
+            successLine: "Ecco il resto e lo scontrino. Arrivederci!",
+            failureLine: "Come paga?"
+          }
+        ]
       }
     ],
     success: "Marco ti consegna un sacchetto caldo di cornetti appena sfornati.",

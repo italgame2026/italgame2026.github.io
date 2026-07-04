@@ -75,10 +75,8 @@ function isTypingTarget(target) {
 }
 
 window.addEventListener("keydown", (e) => {
+  if (isTypingTarget(e.target)) return;
   const key = e.key.toLowerCase();
-  if (movementKeys.has(key) && isTypingTarget(e.target)) {
-    return;
-  }
   if (movementKeys.has(key)) {
     e.preventDefault();
   }
@@ -87,7 +85,14 @@ window.addEventListener("keydown", (e) => {
   if ((key === "e" || key === "enter") && !state.inDialogue && nearestNpcGlobal) {
     openDialogue(nearestNpcGlobal.mission);
   }
-  // Esc: gestionado por el registro global de modales (regla F1, index.html).
+  
+  // Emotes del jugador (A5)
+  if ((key === "1" || key === "2" || key === "3" || key === "4" || key === "f") && !state.inDialogue && !playerState.isJumping && playerState.moveSpeed === 0) {
+    if (key === "1" || key === "f") playEmote(emotes.wave);
+    if (key === "2") playEmote(emotes.yes);
+    if (key === "3") playEmote(emotes.no);
+    if (key === "4") playEmote(emotes.cheer);
+  }
 });
 window.addEventListener("keyup", (e) => { keys.delete(e.key.toLowerCase()); });
 
@@ -1738,7 +1743,26 @@ function createScene() {
   }
 
   if (typeof loadNpcModels === "function") {
-    loadNpcModels(scene, spawnAllNpcs);
+    var npcsLoaded = false;
+    var worldLoaded = false;
+    function checkReady() {
+      if (npcsLoaded && worldLoaded) {
+        spawnAllNpcs();
+      }
+    }
+    loadNpcModels(scene, function() {
+      npcsLoaded = true;
+      checkReady();
+    });
+    if (typeof loadWorldAssets === "function") {
+      loadWorldAssets(scene, function() {
+        worldLoaded = true;
+        checkReady();
+      });
+    } else {
+      worldLoaded = true;
+      checkReady();
+    }
   } else {
     console.warn("[game.js] npcLoader.js no disponible — NPCs omitidos");
     if (typeof initLivingWorld === "function") {
@@ -1776,6 +1800,7 @@ function createScene() {
   const MODEL_YAW_OFFSET = 0;
   let hero = null;
   let anims = { idle: null, walk: null, run: null };
+  let emotes = { wave: null, yes: null, no: null, cheer: null };
   let current = null;
   let feel = "tps";
   let lastCameraDragTime = -Infinity;
@@ -1819,10 +1844,27 @@ function createScene() {
   }
 
   function play(group) {
-    if (group === current) return;
+    if (group === current && !emoteActive) return;
+    if (emoteActive && (group === anims.walk || group === anims.run)) {
+      emoteActive = false;
+    }
+    if (emoteActive) return;
     if (current) current.stop();
     if (group) group.start(true, 1.0, group.from, group.to, false);
     current = group;
+  }
+
+  let emoteActive = false;
+  function playEmote(group) {
+    if (!group) return;
+    if (current) current.stop();
+    emoteActive = true;
+    current = group;
+    group.start(false, 1.0, group.from, group.to, false);
+    group.onAnimationEndObservable.addOnce(() => {
+      emoteActive = false;
+      play(anims.idle);
+    });
   }
 
   function setFeel(mode) {
@@ -1862,26 +1904,60 @@ function createScene() {
 
   // --- Carga del héroe -------------------------------------------------------
   loadingText.textContent = "Cargando personaje 3D…";
-  BABYLON.SceneLoader.ImportMeshAsync("", "https://assets.babylonjs.com/meshes/", "HVGirl.glb", scene)
+  
+  const selectedModel = state.playerModel || "female-a";
+  const modelInfo = window.CHARACTER_MODELS[selectedModel] || window.CHARACTER_MODELS["female-a"];
+  const modelBase = "game/models/characters/kenney-mini-people/";
+  const modelFile = modelInfo.file;
+
+  BABYLON.SceneLoader.ImportMeshAsync("", modelBase, modelFile, scene)
     .then((res) => {
       const glbRoot = res.meshes[0];
       glbRoot.parent = playerParent;
+      
+      // Normalizar escala para que mida ~1.8 unidades de alto
+      glbRoot.scaling.set(1, 1, 1);
+      const bounds = glbRoot.getHierarchyBoundingVectors();
+      const h = bounds.max.y - bounds.min.y;
+      const scale = 1.8 / (h || 1.0);
+      glbRoot.scaling.set(scale, scale, scale);
+
+      // Rotar Y para mirar en la dirección correcta (hacia +Z)
       if (glbRoot.rotationQuaternion) {
         glbRoot.rotationQuaternion = glbRoot.rotationQuaternion.multiply(BABYLON.Quaternion.RotationYawPitchRoll(Math.PI, 0, 0));
       } else {
-        glbRoot.rotationQuaternion = BABYLON.Quaternion.RotationYawPitchRoll(Math.PI, 0, 0);
+        glbRoot.rotation = new BABYLON.Vector3(0, Math.PI, 0);
       }
-      glbRoot.scaling.set(0.09, 0.09, 0.09);
+
       res.meshes.forEach((mesh) => registerShadowCaster(mesh));
       hero = playerParent;
-      // Usar res.animationGroups (no scene) para evitar conflicto con los grupos de NPCs
-      anims.idle = res.animationGroups.find(g => g.name === "Idle") || res.animationGroups[0] || null;
-      anims.walk = res.animationGroups.find(g => g.name === "Walking") || res.animationGroups[1] || null;
-      anims.run = res.animationGroups.find(g => g.name === "Running") || anims.walk;
+
+      // Usar res.animationGroups y mapear robustamente las animaciones
+      anims.idle = res.animationGroups.find(g => g.name.toLowerCase().includes("idle")) || res.animationGroups[0] || null;
+      anims.walk = res.animationGroups.find(g => g.name.toLowerCase().includes("walk")) || res.animationGroups[1] || null;
+      anims.run = res.animationGroups.find(g => g.name.toLowerCase().includes("sprint")) || res.animationGroups.find(g => g.name.toLowerCase().includes("run")) || anims.walk;
+
+      // Mapear los emotes del jugador
+      emotes.wave = res.animationGroups.find(g => g.name.toLowerCase().includes("wave")) || null;
+      emotes.yes = res.animationGroups.find(g => g.name.toLowerCase().includes("yes")) || null;
+      emotes.no = res.animationGroups.find(g => g.name.toLowerCase().includes("no")) || null;
+      emotes.cheer = res.animationGroups.find(g => g.name.toLowerCase().includes("cheer")) || res.animationGroups.find(g => g.name.toLowerCase().includes("jump")) || null;
+
       res.animationGroups.forEach((g) => g.stop());
       play(anims.idle);
       setFeel("tps");
       hideLoading();
+
+      // Conectar botones táctiles de la UI (A5)
+      document.querySelectorAll(".emote-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          if (state.inDialogue || playerState.isJumping || playerState.moveSpeed > 0) return;
+          const emoteType = btn.dataset.emote;
+          if (emoteType && emotes[emoteType]) {
+            playEmote(emotes[emoteType]);
+          }
+        });
+      });
     })
     .catch((err) => {
       console.warn("No se pudo cargar el modelo, usando cápsula:", err);
