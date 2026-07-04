@@ -7,7 +7,18 @@
 var NPC_CONTAINERS = {};
 var _npcLoaderReady = false;
 
-var NPC_MANIFEST = [
+var NPC_MANIFEST = window.useHvGirl ? [
+  {
+    key:          "hvgirl",
+    base:         "https://assets.babylonjs.com/meshes/",
+    file:         "HVGirl.glb",
+    scale:        0.09,
+    rotY180:      true,
+    idleAnimName: "idle",
+    walkAnimName: "walking",
+    sambaAnimName: "samba"
+  }
+] : [
   { key: "female-a", base: "game/models/characters/kenney-mini-people/", file: "character-female-a.glb" },
   { key: "female-b", base: "game/models/characters/kenney-mini-people/", file: "character-female-b.glb" },
   { key: "female-c", base: "game/models/characters/kenney-mini-people/", file: "character-female-c.glb" },
@@ -48,7 +59,9 @@ function loadNpcModels(scene, onReady) {
 // id puede ser un ID de misión ("caffe") o de peatón ("ped_0", "ped_1"…)
 function spawnHumanoidNpc(scene, id, pos, rotY, shadowFn) {
   var modelKey = "female-a";
-  if (id.startsWith("ped_")) {
+  if (window.useHvGirl) {
+    modelKey = "hvgirl";
+  } else if (id.startsWith("ped_")) {
     var idx = parseInt(id.replace("ped_", ""), 10) || 0;
     var keys = ["female-a", "female-b", "female-c", "female-d", "female-e", "female-f", "male-a", "male-b", "male-c", "male-d", "male-e", "male-f"];
     modelKey = keys[idx % keys.length];
@@ -123,18 +136,28 @@ function spawnHumanoidNpc(scene, id, pos, rotY, shadowFn) {
   var glbRoot = instances.rootNodes[0];
   glbRoot.parent = controlNode;
   
-  // Normalizar escala para que mida ~1.8 unidades de alto
-  glbRoot.scaling.set(1, 1, 1);
-  var bounds = glbRoot.getHierarchyBoundingVectors();
-  var h = bounds.max.y - bounds.min.y;
-  var scale = 1.8 / (h || 1.0);
-  glbRoot.scaling.set(scale, scale, scale);
-
-  // Rotar Y para mirar en la dirección correcta (hacia +Z)
-  if (glbRoot.rotationQuaternion) {
-    glbRoot.rotationQuaternion = glbRoot.rotationQuaternion.multiply(BABYLON.Quaternion.RotationYawPitchRoll(Math.PI, 0, 0));
+  if (window.useHvGirl) {
+    glbRoot.scaling.setAll(def.scale || 0.09);
+    if (def.rotY180) {
+      var rot180 = BABYLON.Quaternion.RotationYawPitchRoll(Math.PI, 0, 0);
+      glbRoot.rotationQuaternion = glbRoot.rotationQuaternion
+        ? glbRoot.rotationQuaternion.multiply(rot180)
+        : rot180;
+    }
   } else {
-    glbRoot.rotation = new BABYLON.Vector3(0, Math.PI, 0);
+    // Normalizar escala para que mida ~1.8 unidades de alto
+    glbRoot.scaling.set(1, 1, 1);
+    var bounds = glbRoot.getHierarchyBoundingVectors();
+    var h = bounds.max.y - bounds.min.y;
+    var scale = 1.8 / (h || 1.0);
+    glbRoot.scaling.set(scale, scale, scale);
+
+    // Rotar Y para mirar en la dirección correcta (hacia +Z)
+    if (glbRoot.rotationQuaternion) {
+      glbRoot.rotationQuaternion = glbRoot.rotationQuaternion.multiply(BABYLON.Quaternion.RotationYawPitchRoll(Math.PI, 0, 0));
+    } else {
+      glbRoot.rotation = new BABYLON.Vector3(0, Math.PI, 0);
+    }
   }
 
   if (shadowFn) glbRoot.getChildMeshes().forEach(function(m) { shadowFn(m); });
@@ -146,10 +169,16 @@ function spawnHumanoidNpc(scene, id, pos, rotY, shadowFn) {
     var base = ag.name.replace(/^Clone of /i, "");
     ag.name = prefix + base;
     var lower = base.toLowerCase();
-    if (!idleAnim  && lower.indexOf("idle") !== -1)   idleAnim  = ag;
-    if (!walkAnim  && lower.indexOf("walk") !== -1)   walkAnim  = ag;
-    if (!sambaAnim && lower.indexOf("cheer") !== -1)  sambaAnim = ag;
-    if (!sambaAnim && lower.indexOf("dance") !== -1)  sambaAnim = ag;
+    if (window.useHvGirl) {
+      if (!idleAnim  && lower === (def.idleAnimName  || "idle"))   idleAnim  = ag;
+      if (!walkAnim  && lower === (def.walkAnimName  || "walking")) walkAnim  = ag;
+      if (!sambaAnim && lower === (def.sambaAnimName || "samba"))   sambaAnim = ag;
+    } else {
+      if (!idleAnim  && lower.indexOf("idle") !== -1)   idleAnim  = ag;
+      if (!walkAnim  && lower.indexOf("walk") !== -1)   walkAnim  = ag;
+      if (!sambaAnim && lower.indexOf("cheer") !== -1)  sambaAnim = ag;
+      if (!sambaAnim && lower.indexOf("dance") !== -1)  sambaAnim = ag;
+    }
   });
 
   if (!idleAnim) idleAnim = instances.animationGroups[0] || null;

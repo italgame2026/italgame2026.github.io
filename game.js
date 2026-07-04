@@ -1910,41 +1910,55 @@ function createScene() {
   
   const selectedModel = state.playerModel || "female-a";
   const modelInfo = window.CHARACTER_MODELS[selectedModel] || window.CHARACTER_MODELS["female-a"];
-  const modelBase = "game/models/characters/kenney-mini-people/";
-  const modelFile = modelInfo.file;
+  const modelBase = window.useHvGirl ? "https://assets.babylonjs.com/meshes/" : "game/models/characters/kenney-mini-people/";
+  const modelFile = window.useHvGirl ? "HVGirl.glb" : modelInfo.file;
 
   BABYLON.SceneLoader.ImportMeshAsync("", modelBase, modelFile, scene)
     .then((res) => {
       const glbRoot = res.meshes[0];
       glbRoot.parent = playerParent;
       
-      // Normalizar escala para que mida ~1.8 unidades de alto
-      glbRoot.scaling.set(1, 1, 1);
-      const bounds = glbRoot.getHierarchyBoundingVectors();
-      const h = bounds.max.y - bounds.min.y;
-      const scale = 1.8 / (h || 1.0);
-      glbRoot.scaling.set(scale, scale, scale);
-
-      // Rotar Y para mirar en la dirección correcta (hacia +Z)
-      if (glbRoot.rotationQuaternion) {
-        glbRoot.rotationQuaternion = glbRoot.rotationQuaternion.multiply(BABYLON.Quaternion.RotationYawPitchRoll(Math.PI, 0, 0));
+      if (window.useHvGirl) {
+        glbRoot.scaling.setAll(0.09);
+        const rot180 = BABYLON.Quaternion.RotationYawPitchRoll(Math.PI, 0, 0);
+        glbRoot.rotationQuaternion = glbRoot.rotationQuaternion
+          ? glbRoot.rotationQuaternion.multiply(rot180)
+          : rot180;
       } else {
-        glbRoot.rotation = new BABYLON.Vector3(0, Math.PI, 0);
+        // Normalizar escala para que mida ~1.8 unidades de alto
+        glbRoot.scaling.set(1, 1, 1);
+        const bounds = glbRoot.getHierarchyBoundingVectors();
+        const h = bounds.max.y - bounds.min.y;
+        const scale = 1.8 / (h || 1.0);
+        glbRoot.scaling.set(scale, scale, scale);
+
+        // Rotar Y para mirar en la dirección correcta (hacia +Z)
+        if (glbRoot.rotationQuaternion) {
+          glbRoot.rotationQuaternion = glbRoot.rotationQuaternion.multiply(BABYLON.Quaternion.RotationYawPitchRoll(Math.PI, 0, 0));
+        } else {
+          glbRoot.rotation = new BABYLON.Vector3(0, Math.PI, 0);
+        }
       }
 
       res.meshes.forEach((mesh) => registerShadowCaster(mesh));
       hero = playerParent;
 
       // Usar res.animationGroups y mapear robustamente las animaciones
-      anims.idle = res.animationGroups.find(g => g.name.toLowerCase().includes("idle")) || res.animationGroups[0] || null;
-      anims.walk = res.animationGroups.find(g => g.name.toLowerCase().includes("walk")) || res.animationGroups[1] || null;
-      anims.run = res.animationGroups.find(g => g.name.toLowerCase().includes("sprint")) || res.animationGroups.find(g => g.name.toLowerCase().includes("run")) || anims.walk;
+      if (window.useHvGirl) {
+        anims.idle = res.animationGroups.find(g => g.name === "Idle") || res.animationGroups[0] || null;
+        anims.walk = res.animationGroups.find(g => g.name === "Walking") || res.animationGroups[1] || null;
+        anims.run = res.animationGroups.find(g => g.name === "Running") || anims.walk;
+      } else {
+        anims.idle = res.animationGroups.find(g => g.name.toLowerCase().includes("idle")) || res.animationGroups[0] || null;
+        anims.walk = res.animationGroups.find(g => g.name.toLowerCase().includes("walk")) || res.animationGroups[1] || null;
+        anims.run = res.animationGroups.find(g => g.name.toLowerCase().includes("sprint")) || res.animationGroups.find(g => g.name.toLowerCase().includes("run")) || anims.walk;
 
-      // Mapear los emotes del jugador
-      emotes.wave = res.animationGroups.find(g => g.name.toLowerCase().includes("wave")) || null;
-      emotes.yes = res.animationGroups.find(g => g.name.toLowerCase().includes("yes")) || null;
-      emotes.no = res.animationGroups.find(g => g.name.toLowerCase().includes("no")) || null;
-      emotes.cheer = res.animationGroups.find(g => g.name.toLowerCase().includes("cheer")) || res.animationGroups.find(g => g.name.toLowerCase().includes("jump")) || null;
+        // Mapear los emotes del jugador
+        emotes.wave = res.animationGroups.find(g => g.name.toLowerCase().includes("wave")) || null;
+        emotes.yes = res.animationGroups.find(g => g.name.toLowerCase().includes("yes")) || null;
+        emotes.no = res.animationGroups.find(g => g.name.toLowerCase().includes("no")) || null;
+        emotes.cheer = res.animationGroups.find(g => g.name.toLowerCase().includes("cheer")) || res.animationGroups.find(g => g.name.toLowerCase().includes("jump")) || null;
+      }
 
       res.animationGroups.forEach((g) => g.stop());
       play(anims.idle);

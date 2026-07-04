@@ -375,3 +375,5 @@ window.speakItalianSequence = speakItalianSequence;
 window.stopItalianSpeech = stopItalianSpeech;
 window.showProfileSetup = showProfileSetup;
 window.updateGameHUD = updateGameHUD;
+
+window.useHvGirl = new URLSearchParams(window.location.search).get("style") === "hvgirl";
