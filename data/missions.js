@@ -786,30 +786,30 @@ const missions = [
         },
         "dialogue": [
           {
-            "prompt": "Come vuole tagliare i capelli?",
-            "hint": "El peluquero pregunta cómo quieres el corte.",
+            "prompt": "Si accomodi. Come li vuole i capelli oggi?",
+            "hint": "Pregunta cómo quieres el pelo. Di cortos a los lados y un poco largos arriba.",
             "choices": [
-              "Solo un po', per favore.",
-              "Solamente un pochino, per favore.",
-              "Solo un poco, per piacere."
+              "Corti ai lati e un po' lunghi sopra.",
+              "Corti ai lati e un poco lunghi sopra.",
+              "Corti a i lati e un po' lunghi sopra."
             ],
             "correct": 0,
-            "explanation": "'Solo un po'' significa 'solo un poco' de forma correcta.",
-            "successLine": "Va bene! Solo una spuntatina allora.",
-            "failureLine": "Come? Può ripetere?"
+            "explanation": "'Un po'' es la forma habitual; y 'ai lati' (a + i).",
+            "successLine": "Perfetto. Le lavo prima i capelli?",
+            "failureLine": "Non ho capito, mi spieghi meglio."
           },
           {
-            "prompt": "Vuole anche regolare la barba?",
-            "hint": "Pregunta si también quieres arreglo de barba.",
+            "prompt": "Vuole che le sistemi anche la barba?",
+            "hint": "Ofrece arreglar la barba. Pídele (formal) que te la recorte un poco.",
             "choices": [
-              "No, solo i capelli, grazie.",
-              "No, solo il capello, grazie.",
-              "No, non la barba, per piacere."
+              "Sì, me la accorci un po', per favore.",
+              "Sì, me la accorcia un po', per favore.",
+              "Sì, mi accorci un po' di barba."
             ],
             "correct": 0,
-            "explanation": "'Solo i capelli' es la respuesta natural.",
-            "successLine": "Perfetto! Dieci minuti ed è pronto!",
-            "failureLine": "Ho capito male..."
+            "explanation": "Imperativo formal 'me la accorci' (Lei); el pronombre 'la' se refiere a 'la barba'.",
+            "successLine": "Va bene! Tra poco è tutto pronto.",
+            "failureLine": "Come dice? Solo i capelli allora?"
           }
         ]
       },
@@ -986,30 +986,30 @@ const missions = [
         },
         "dialogue": [
           {
-            "prompt": "Per il centro, prenda il binario due.",
-            "hint": "El agente indica que para el centro debes tomar el andén dos.",
+            "prompt": "Il treno per Firenze parte dal binario quattro. Ha bisogno d'altro?",
+            "hint": "El agente informa el andén y ofrece más ayuda. Pregunta por la hora.",
             "choices": [
-              "Grazie, vado al binario due.",
-              "Grazie, vado alla piattaforma due.",
-              "Grazie, vado a il binario due."
+              "Sì, a che ora parte esattamente?",
+              "Sì, a che ora parte di preciso?",
+              "Sì, quando parte il treno alle?"
             ],
             "correct": 0,
-            "explanation": "'Binario' es andén. La contracción correcta es 'al' (a + il).",
-            "successLine": "Esatto! Il treno arriva tra cinque minuti.",
-            "failureLine": "No, guardi meglio il tabellone."
+            "explanation": "'A che ora parte?' es la forma estándar de preguntar el horario; 'di preciso' es un calco del español.",
+            "successLine": "Alle 14:30. Le conviene convalidare subito il biglietto.",
+            "failureLine": "Come? Non ho capito bene la domanda."
           },
           {
-            "prompt": "Ha già il biglietto?",
-            "hint": "Pregunta si ya tienes el billete.",
+            "prompt": "Ha già convalidato il biglietto alla macchinetta?",
+            "hint": "Pregunta si validaste el billete. Dile que lo validas en el andén.",
             "choices": [
-              "No, dove posso comprarlo?",
-              "No, dove posso a comprarlo?",
-              "Non ancora. Dove si compra?"
+              "No, lo convalido adesso al binario.",
+              "No, lo convalido adesso allo binario.",
+              "No, lo convalido adesso nel binario."
             ],
             "correct": 0,
-            "explanation": "'Dove posso comprarlo?' es la forma correcta.",
-            "successLine": "Alla biglietteria automatica, laggiù in fondo.",
-            "failureLine": "Devi acquistarlo prima di salire."
+            "explanation": "'Al binario' (a + il). 'Binario' es masculino: no lleva 'allo' ni 'nel'.",
+            "successLine": "Perfetto. Buon viaggio!",
+            "failureLine": "Attento: senza convalida rischia una multa."
           }
         ]
       },
@@ -1185,30 +1185,30 @@ const missions = [
         },
         "dialogue": [
           {
-            "prompt": "Che sintomi ha?",
-            "hint": "La doctora pregunta qué síntomas tienes.",
+            "prompt": "Mi dica, cosa la disturba oggi?",
+            "hint": "La doctora pregunta qué te molesta. Describe dolor de garganta y tos.",
             "choices": [
-              "Ho mal di testa e un po' di febbre.",
-              "Ho mal di testa e febbre.",
-              "Ho dolore di testa e febbre."
+              "Ho mal di gola e la tosse da due giorni.",
+              "Ho un mal di gola e tosse da due giorni.",
+              "Tengo mal di gola e tosse da due giorni."
             ],
             "correct": 0,
-            "explanation": "'Ho mal di testa' es la forma correcta. 'Un po' di febbre' significa un poco de fiebre.",
-            "successLine": "Da quanto tempo? Da ieri?",
-            "failureLine": "Mi descriva meglio i sintomi."
+            "explanation": "'Ho mal di gola' — 'avere mal di' va sin artículo indeterminado; y se usa 'avere' (ho), no 'tenere'.",
+            "successLine": "Le do uno sciroppo. Prende già altri farmaci?",
+            "failureLine": "Scusi, può ripetere i sintomi?"
           },
           {
-            "prompt": "È allergico a qualche farmaco?",
-            "hint": "Pregunta si eres alérgico a algún medicamento.",
+            "prompt": "Prende già altri farmaci in questo periodo?",
+            "hint": "Pregunta si tomas otros medicamentos. Responde que ninguno más.",
             "choices": [
-              "No, nessuna allergia.",
-              "No, nessuno allergia.",
-              "Non sono allergico a niente."
+              "No, nessun altro farmaco.",
+              "No, nessun'altro farmaco.",
+              "No, niente altri farmaci."
             ],
             "correct": 0,
-            "explanation": "'Nessuna allergia' es la concordancia correcta en femenino.",
-            "successLine": "Bene. Le prescrivo un analgesico leggero.",
-            "failureLine": "Ci riprovi."
+            "explanation": "'Nessun altro farmaco' — 'nessun' se apocopa ante masculino sin apóstrofo.",
+            "successLine": "Perfetto. Prenda lo sciroppo tre volte al giorno.",
+            "failureLine": "È importante saperlo, ci pensi bene."
           }
         ]
       },
@@ -1385,30 +1385,30 @@ const missions = [
         },
         "dialogue": [
           {
-            "prompt": "Che taglia porta?",
-            "hint": "La dependienta pregunta qué talla usas.",
+            "prompt": "Cerca qualcosa per un'occasione particolare?",
+            "hint": "Pregunta si buscas algo especial. Di que buscas una camisa elegante.",
             "choices": [
-              "Porto una taglia media.",
-              "Uso una taglia media.",
-              "Porto una taglia mediana."
+              "Sì, cerco una camicia elegante.",
+              "Sì, cerco una camicia di elegante.",
+              "Sì, cerco una elegante camicia."
             ],
             "correct": 0,
-            "explanation": "El verbo 'portare' es el correcto para referirse a la talla de vestir en italiano.",
-            "successLine": "Perfetto! Abbiamo questa giacca nella sua taglia.",
-            "failureLine": "Non abbiamo quella taglia."
+            "explanation": "El adjetivo calificativo va después del sustantivo, sin preposición: 'camicia elegante'.",
+            "successLine": "Che taglia porta di solito?",
+            "failureLine": "Non ho capito, che tipo cerca?"
           },
           {
-            "prompt": "Le piace questo colore o preferisce il blu?",
-            "hint": "Pregunta si te gusta este color o prefieres el azul.",
+            "prompt": "Questa le piace? La abbiamo in due colori.",
+            "hint": "Te ofrece la prenda en dos colores. Di que la prefieres en verde.",
             "choices": [
-              "Preferisco il blu, grazie.",
-              "Prefero il blu, grazie.",
-              "Meglio il blu, per piacere."
+              "La preferisco in verde, se possibile.",
+              "La prefero in verde, se possibile.",
+              "La preferisco di verde, se possibile."
             ],
             "correct": 0,
-            "explanation": "'Preferisco' es la conjugación regular de 'preferire' en primera persona.",
-            "successLine": "Buona scelta! Il blu le sta molto bene.",
-            "failureLine": "Non disponibile."
+            "explanation": "'Preferisco' (verbo preferire) + 'in verde' para el color. 'Prefero' no existe.",
+            "successLine": "Ottima scelta! Vuole provarla?",
+            "failureLine": "Mi dispiace, quel colore è esaurito."
           }
         ]
       },
@@ -1598,43 +1598,43 @@ const missions = [
         },
         "dialogue": [
           {
-            "prompt": "Ha prenotato un tavolo?",
-            "hint": "El mesero pregunta si reservaste mesa.",
+            "prompt": "Mi dispiace, senza prenotazione c'è da attendere. Le va di aspettare al bar?",
+            "hint": "No hay reserva y hay que esperar. Acepta y pide un aperitivo mientras tanto.",
             "choices": [
-              "Sì, a nome di {name}.",
-              "Sì, in nome di {name}.",
-              "Sì, nel nome di {name}."
+              "Volentieri, prenderei un aperitivo intanto.",
+              "Volentieri, prenderei un aperitivo per intanto.",
+              "Va bene, voglio un aperitivo."
             ],
             "correct": 0,
-            "explanation": "'A nome di' es la preposición correcta para reservar.",
-            "successLine": "Ah, ecco! Il suo tavolo è vicino alla finestra.",
-            "failureLine": "Non trovo la prenotazione."
+            "explanation": "El condicional 'prenderei' suaviza la petición; 'intanto' (mientras tanto) va sin preposición.",
+            "successLine": "Prego, si accomodi al bancone. Ecco il menù.",
+            "failureLine": "Come preferisce, il tavolo sarà pronto a breve."
           },
           {
-            "prompt": "Ha già deciso cosa ordinare?",
-            "hint": "Pregunta si ya decidiste qué pedir.",
+            "prompt": "Cosa le porto da bere con il pasto?",
+            "hint": "Pregunta qué quieres beber. Pide una botella de agua natural.",
             "choices": [
-              "Prendo gli spaghetti al pomodoro.",
-              "Prendo i spaghetti al pomodoro.",
-              "Voglio spaghetti con pomodoro."
+              "Vorrei una bottiglia d'acqua naturale.",
+              "Vorrei una bottiglia di acqua naturale.",
+              "Voglio una bottiglia d'acqua naturale."
             ],
             "correct": 0,
-            "explanation": "Spaghetti es masculino plural con vocal sibilante, usa el artículo 'gli'.",
-            "successLine": "Ottima scelta! E da bere?",
-            "failureLine": "Non disponibile."
+            "explanation": "'D'acqua' con elisión suena más natural; 'vorrei' mantiene el registro cortés.",
+            "successLine": "Certo. Ha già scelto il piatto principale?",
+            "failureLine": "Arriva subito."
           },
           {
-            "prompt": "Desidera anche il dolce? Abbiamo tiramisù.",
-            "hint": "Ofrece postre: tiramisù.",
+            "prompt": "Desidera altro o le porto il conto?",
+            "hint": "Pregunta si deseas algo más. Pide la cuenta y ofrece pagar con tarjeta.",
             "choices": [
-              "Sì, volentieri! Un tiramisù.",
-              "Sì, certo. Un tiramisù.",
-              "Sì, con piacere. Uno tiramisù."
+              "Il conto, per favore. Posso pagare con carta?",
+              "La conta, per favore. Posso pagare con carta?",
+              "Il conto, per favore. Posso pagare in carta?"
             ],
             "correct": 0,
-            "explanation": "'Volentieri' expresa aceptación con entusiasmo. El artículo 'un' es correcto con tiramisù.",
-            "successLine": "Arriva subito! Buon appetito!",
-            "failureLine": "Finito."
+            "explanation": "Es 'il conto' (masculino) y se paga 'con carta' (instrumento con 'con').",
+            "successLine": "Certo. Ecco il POS. Grazie e a presto!",
+            "failureLine": "Un attimo che sistemo."
           }
         ]
       },
@@ -1837,30 +1837,30 @@ const missions = [
         },
         "dialogue": [
           {
-            "prompt": "Ti va di prendere un caffè più tardi?",
-            "hint": "Nico pregunta si te apetece tomar un café más tarde.",
+            "prompt": "Che ne dici di vederci più tardi per una passeggiata?",
+            "hint": "Te propone verse más tarde. Di que te gustaría pero hoy estás ocupado.",
             "choices": [
-              "Sì, volentieri. A che ora?",
-              "Sì, con gusto. A che ora?",
-              "D'accordo. Che ora?"
+              "Mi piacerebbe, ma oggi sono un po' impegnato.",
+              "Mi piacerebbe, ma oggi sto un po' impegnato.",
+              "Mi piace, ma oggi sono impegnato."
             ],
             "correct": 0,
-            "explanation": "'Sì, volentieri' es la forma habitual y natural de aceptar una invitación cordial.",
-            "successLine": "Alle cinque? Davanti alla fontana in piazza!",
-            "failureLine": "Forse un'altra volta."
+            "explanation": "Para responder a una propuesta se usa el condicional 'mi piacerebbe'; y 'essere impegnato' (sono), no 'stare'.",
+            "successLine": "Nessun problema! Allora facciamo domani?",
+            "failureLine": "Ah, va bene, non fa niente."
           },
           {
-            "prompt": "Sei uno studente anche tu?",
-            "hint": "Pregunta si eres estudiante también.",
+            "prompt": "Facciamo domani pomeriggio, allora?",
+            "hint": "Propone mañana por la tarde. Acepta y pregunta a qué hora quedan.",
             "choices": [
-              "Sì, studio italiano.",
-              "Sì, sto studiando la lingua.",
-              "Sì, imparo l'italiano."
+              "D'accordo! Ci vediamo alle quattro?",
+              "D'accordo! Ci vediamo a le quattro?",
+              "D'accordo! Ci vediamo alle ore quattro?"
             ],
             "correct": 0,
-            "explanation": "'Studio italiano' es directo y correcto.",
-            "successLine": "Che bello! Parli già molto bene!",
-            "failureLine": "Capisco."
+            "explanation": "'Alle quattro' (a + le). Entre amigos no se dice 'alle ore quattro'.",
+            "successLine": "Perfetto, a domani allora!",
+            "failureLine": "A che ora dicevi? Non ho capito."
           }
         ]
       },
@@ -2036,30 +2036,30 @@ const missions = [
         },
         "dialogue": [
           {
-            "prompt": "Puoi aiutarmi a trovare il tavolo delle bevande?",
-            "hint": "Alba pide ayuda para encontrar la mesa de bebidas.",
+            "prompt": "Mi daresti una mano a spostare queste sedie vicino al palco?",
+            "hint": "Alba pide ayuda con las sillas. Di que las pones junto al escenario.",
             "choices": [
-              "Certo! È vicino alla fontana.",
-              "Certo! È vicino al fontana.",
-              "Certo! Sta vicino la fontana."
+              "Certo! Le metto accanto al palco.",
+              "Certo! Le metto accanto alla palco.",
+              "Certo! Le metto vicino il palco."
             ],
             "correct": 0,
-            "explanation": "'Vicino alla...' es la preposición articulada correcta en femenino.",
-            "successLine": "Ah, non l'avevo visto! Grazie mille!",
-            "failureLine": "Non è lì..."
+            "explanation": "'Accanto al palco' (a + il). 'Palco' es masculino, y 'vicino/accanto' rigen 'a'.",
+            "successLine": "Grazie mille! Sei di grande aiuto.",
+            "failureLine": "Attento, non lì... un po' più in là."
           },
           {
-            "prompt": "Hai visto anche il tavolo dei dolci?",
-            "hint": "Pregunta si viste la mesa de postres.",
+            "prompt": "Puoi portare le bevande fresche dal frigo?",
+            "hint": "Te pide llevar las bebidas. Di que las llevas a la mesa.",
             "choices": [
-              "Sì, è accanto al palco.",
-              "Sì, è al lato del palco.",
-              "Sì, sta vicino il palco."
+              "Sì, le porto subito al tavolo.",
+              "Sì, li porto subito al tavolo.",
+              "Sì, le porto subito nel tavolo."
             ],
             "correct": 0,
-            "explanation": "'Accanto al palco' usa la contracción correcta (a + il = al).",
-            "successLine": "Perfetto! Sei un angelo, grazie!",
-            "failureLine": "Dovrei controllare."
+            "explanation": "'Le bevande' es femenino plural → pronombre 'le'. Y 'al tavolo' (a + il).",
+            "successLine": "Perfetto! La festa può cominciare!",
+            "failureLine": "Occhio, non farle cadere!"
           }
         ]
       },
@@ -2246,43 +2246,30 @@ const missions = [
         },
         "dialogue": [
           {
-            "prompt": "Buonasera! Ha una prenotazione?",
-            "hint": "La recepcionista pregunta si tienes reserva.",
+            "prompt": "Buonasera. Ha un documento per la registrazione?",
+            "hint": "Pide un documento. Ofrece tu pasaporte.",
             "choices": [
-              "Sì, a nome di {name}.",
-              "Sì, in nome di {name}.",
-              "Sì, nel nome di {name}."
+              "Sì, ecco il mio passaporto.",
+              "Sì, ecco il mio passaporte.",
+              "Sì, ecco mio passaporto."
             ],
             "correct": 0,
-            "explanation": "'A nome di' es la preposición correcta para reservas.",
-            "successLine": "Eccola! Camera singola al terzo piano.",
-            "failureLine": "Non trovo la prenotazione."
+            "explanation": "'Il mio passaporto' — el posesivo lleva artículo, y 'passaporto' termina en -o.",
+            "successLine": "Grazie. Camera doppia al secondo piano.",
+            "failureLine": "Mi serve un documento valido, per favore."
           },
           {
-            "prompt": "Quante notti si ferma?",
-            "hint": "Pregunta cuántas noches te quedas.",
+            "prompt": "Ecco le chiavi. La colazione è al piano terra dalle sette.",
+            "hint": "Te da las llaves e informa del desayuno. Pregunta a qué hora cierra.",
             "choices": [
-              "Tre notti, per favore.",
-              "Tre nottes, per favore.",
-              "Tre notte, per favore."
+              "Grazie. A che ora chiude la colazione?",
+              "Grazie. A che ora chiude il colazione?",
+              "Grazie. Quando chiude a la colazione?"
             ],
             "correct": 0,
-            "explanation": "'Notti' es el plural femenino correcto de 'notte'.",
-            "successLine": "Ecco la chiave. La colazione è dalle 7 alle 10.",
-            "failureLine": "Nessuna camera."
-          },
-          {
-            "prompt": "Ha bisogno di aiuto con i bagagli?",
-            "hint": "Ofrece ayuda con el equipaje.",
-            "choices": [
-              "No, grazie. Ho solo questa borsa.",
-              "No, grazie. Ho solo questo borsa.",
-              "Grazie, ma faccio da solo."
-            ],
-            "correct": 0,
-            "explanation": "'Borsa' es femenino, usa 'questa'.",
-            "successLine": "Buon soggiorno!",
-            "failureLine": "Errore."
+            "explanation": "'La colazione' es femenino; se pregunta 'a che ora chiude'.",
+            "successLine": "Fino alle dieci. Buon soggiorno!",
+            "failureLine": "Scusi, non ho capito."
           }
         ]
       },
@@ -2362,8 +2349,8 @@ const missions = [
     "place": "Gelateria",
     "npc": "Gelataio Mario",
     "pos": {
-      "x": -15.0,
-      "z": -7.0
+      "x": -15,
+      "z": -7
     },
     "color": "#ffb6c1",
     "cefr": "A1",
@@ -2470,43 +2457,30 @@ const missions = [
         },
         "dialogue": [
           {
-            "prompt": "Cono o coppetta?",
-            "hint": "Pregunta si quieres cono o vasito.",
+            "prompt": "Ciao! Quanti gusti per il tuo cono?",
+            "hint": "Pregunta cuántos sabores. Di que dos.",
             "choices": [
-              "Un cono, per favore.",
-              "Un gelato al cono, per piacere.",
-              "Cono, per piacere."
+              "Due gusti, per favore.",
+              "Due gusto, per favore.",
+              "Dei due gusti, per favore."
             ],
             "correct": 0,
-            "explanation": "'Un cono, per favore' es la forma más directa y correcta.",
-            "successLine": "Quanti gusti desidera?",
-            "failureLine": "Finiti i coni."
+            "explanation": "'Due gusti' — plural sin partitivo.",
+            "successLine": "Quali gusti allora?",
+            "failureLine": "Come? Quanti ne vuoi?"
           },
           {
-            "prompt": "Quali gusti preferisce?",
-            "hint": "Pregunta qué sabores prefieres.",
+            "prompt": "Quali gusti ti metto?",
+            "hint": "Pregunta qué sabores. Pide limón y chocolate.",
             "choices": [
-              "Cioccolato e fragola.",
-              "Cioccolata e fragola, per piacere.",
-              "Cioccolato con fragola, per piacere."
+              "Limone e cioccolato, grazie.",
+              "Limone y cioccolato, grazie.",
+              "Un limone e un cioccolato, grazie."
             ],
             "correct": 0,
-            "explanation": "'Cioccolato e fragola' es correcto.",
-            "successLine": "Ecco qua! Con panna?",
-            "failureLine": "Finiti."
-          },
-          {
-            "prompt": "Sono tre euro.",
-            "hint": "Te dice el precio: 3 euros.",
-            "choices": [
-              "Ecco a Lei. Grazie!",
-              "Ecco per Lei. Grazie!",
-              "Ecco. Tenga."
-            ],
-            "correct": 0,
-            "explanation": "'Ecco a Lei' es la cortesía formal.",
-            "successLine": "Grazie! Arrivederci!",
-            "failureLine": "Errore."
+            "explanation": "En italiano la conjunción 'y' es 'e'; los gustos no llevan 'un'.",
+            "successLine": "Ecco! Vuoi la panna sopra?",
+            "failureLine": "Non ho capito i gusti."
           }
         ]
       },
@@ -2612,8 +2586,8 @@ const missions = [
     "place": "Taxi",
     "npc": "Tassista Bruno",
     "pos": {
-      "x": 26.0,
-      "z": -8.0
+      "x": 26,
+      "z": -8
     },
     "color": "#f5d76e",
     "cefr": "A2",
@@ -2722,43 +2696,30 @@ const missions = [
         },
         "dialogue": [
           {
-            "prompt": "Dove la porto?",
-            "hint": "El taxista pregunta a dónde te lleva.",
+            "prompt": "Salve! Qual è la destinazione?",
+            "hint": "Pregunta el destino. Di a la estación central.",
             "choices": [
-              "In centro, per favore.",
-              "Al centro, per favore.",
-              "Nel centro, per piacere."
+              "Alla stazione centrale, per favore.",
+              "A la stazione centrale, per favore.",
+              "In stazione centrale, per favore."
             ],
             "correct": 0,
-            "explanation": "'In centro' es la preposición y término correcto para ir al centro.",
-            "successLine": "D'accordo! Per la strada veloce?",
-            "failureLine": "Non conosco."
+            "explanation": "'Alla stazione' (a + la): con un lugar específico se usa la preposición articulada.",
+            "successLine": "Va bene. C'è un po' di traffico, ma ci proviamo.",
+            "failureLine": "Dove, scusi? Mi ripeta l'indirizzo."
           },
           {
-            "prompt": "Preferisce la strada panoramica? Ci mette più tempo.",
-            "hint": "Ofrece ruta panorámica pero avisa que tarda más.",
+            "prompt": "Siamo quasi arrivati. Dove la lascio?",
+            "hint": "Pregunta dónde parar. Pídele que pare en la esquina (trato formal).",
             "choices": [
-              "No, vada diretto, grazie.",
-              "No, va diretto, grazie.",
-              "Meglio la strada veloce."
+              "Si fermi qui all'angolo, grazie.",
+              "Ferma qui all'angolo, grazie.",
+              "Si ferma qui all'angolo, grazie."
             ],
             "correct": 0,
-            "explanation": "'Vada diretto' es la conjugación formal de cortesía.",
-            "successLine": "Va bene! Arriveremo in dieci minuti.",
-            "failureLine": "Traffico."
-          },
-          {
-            "prompt": "Ecco, siamo arrivati. Sono quindici euro.",
-            "hint": "Llegaron. Son 15 euros.",
-            "choices": [
-              "Ecco venti. Tenga il resto.",
-              "Ecco venti. Tenga il cambio.",
-              "Tenga. Arrivederci."
-            ],
-            "correct": 0,
-            "explanation": "'Tenga il resto' es la expresión formal.",
-            "successLine": "Grazie! Buona permanenza!",
-            "failureLine": "Errore."
+            "explanation": "'Si fermi' es el imperativo formal (Lei); 'ferma' es informal y 'si ferma' es indicativo.",
+            "successLine": "Ecco. Sono otto euro. Tenga pure il resto.",
+            "failureLine": "Non posso fermarmi qui, c'è divieto."
           }
         ]
       },
@@ -2839,7 +2800,7 @@ const missions = [
     "npc": "Bigliettaia Carla",
     "pos": {
       "x": 22.5,
-      "z": 14.0
+      "z": 14
     },
     "color": "#8d9b6a",
     "cefr": "A2",
@@ -2935,30 +2896,30 @@ const missions = [
         },
         "dialogue": [
           {
-            "prompt": "Intero o ridotto?",
-            "hint": "Pregunta si entrada normal o reducida.",
+            "prompt": "Un biglietto intero? Sono dodici euro.",
+            "hint": "Menciona el precio entero. Pregunta si hay descuento para estudiantes.",
             "choices": [
-              "Ridotto, sono studente.",
-              "Ridotta, sono studente.",
-              "Ridotto, perché sono un studente."
+              "C'è uno sconto per studenti?",
+              "C'è un sconto per studenti?",
+              "C'è uno sconto di studenti?"
             ],
             "correct": 0,
-            "explanation": "'Ridotto' es el adjetivo masculino. 'Sono studente' omite el artículo en declaraciones de profesión.",
-            "successLine": "Mi mostri un documento, per favore.",
-            "failureLine": "Solo tariffa intera."
+            "explanation": "'Uno sconto' (ante s + consonante) y 'per studenti' (finalidad).",
+            "successLine": "Sì, con il tesserino il ridotto è otto euro.",
+            "failureLine": "Mi mostri un documento, prego."
           },
           {
-            "prompt": "Le interessa anche la mostra temporanea?",
-            "hint": "Ofrece entrada a exposición temporal.",
+            "prompt": "Quella mostra temporanea le interessa?",
+            "hint": "Te ofrece la exposición temporal. Pregunta cuánto cuesta esa entrada.",
             "choices": [
-              "Sì, quanto costa in più?",
-              "Sì, quanto costano in più?",
-              "Sì. Qual è il prezzo aggiuntivo?"
+              "Sì, quanto costa quel biglietto?",
+              "Sì, quanto costa quello biglietto?",
+              "Sì, quanto costa questa biglietto?"
             ],
             "correct": 0,
-            "explanation": "'Quanto costa' es correcto para precio en singular.",
-            "successLine": "Solo quattro euro. Ne vale la pena!",
-            "failureLine": "Mostra chiusa."
+            "explanation": "'Quel biglietto' — 'quello' se apocopa a 'quel' ante consonante; 'biglietto' es masculino.",
+            "successLine": "Cinque euro in più. Le faccio il combinato?",
+            "failureLine": "La mostra chiude presto, si sbrighi."
           }
         ]
       },
@@ -3038,8 +2999,8 @@ const missions = [
     "place": "Supermercato",
     "npc": "Cassiere Davide",
     "pos": {
-      "x": -25.0,
-      "z": -8.0
+      "x": -25,
+      "z": -8
     },
     "color": "#c7a55a",
     "cefr": "A1",
@@ -3132,30 +3093,30 @@ const missions = [
         },
         "dialogue": [
           {
-            "prompt": "Vuole un sacchetto?",
-            "hint": "Pregunta si quieres una bolsa.",
+            "prompt": "Ha la tessera del supermercato?",
+            "hint": "Pregunta si tienes la tarjeta. Di que no la tienes.",
             "choices": [
-              "Sì, grazie.",
-              "Sì, per favore.",
-              "D'accordo."
+              "No, non ce l'ho, mi dispiace.",
+              "No, non l'ho, mi dispiace.",
+              "No, no ce l'ho, mi dispiace."
             ],
             "correct": 0,
-            "explanation": "'Sì, grazie' es educado y suficiente.",
-            "successLine": "Sono dieci centesimi. Paga in contanti o con bancomat?",
-            "failureLine": "Niente sacchetti."
+            "explanation": "'Non ce l'ho' es la forma idiomática obligatoria para 'no la tengo'.",
+            "successLine": "Va bene. Vuole un sacchetto?",
+            "failureLine": "Senza tessera niente punti, mi spiace."
           },
           {
-            "prompt": "Ha la tessera fedeltà?",
-            "hint": "Pregunta si tienes tarjeta de fidelidad.",
+            "prompt": "Paga in contanti?",
+            "hint": "Pregunta si pagas en efectivo. Di que no tienes y ofrece pagar con tarjeta.",
             "choices": [
-              "No, non ce l'ho.",
-              "No, non la tengo.",
-              "No, non ho."
+              "No, non ho contanti. Posso con il bancomat?",
+              "No, non tengo contanti. Posso con il bancomat?",
+              "No, nessun contante. Posso con il bancomat?"
             ],
             "correct": 0,
-            "explanation": "'Non ce l'ho' es la forma obligatoria para posesión de un objeto.",
-            "successLine": "Va bene. Sono ventidue euro.",
-            "failureLine": "Niente sconto."
+            "explanation": "Se dice 'non ho contanti' (avere). 'Tenere' es un calco del español.",
+            "successLine": "Nessun problema. Inserisca la carta.",
+            "failureLine": "Solo contanti a questa cassa, mi dispiace."
           }
         ]
       },
@@ -3235,8 +3196,8 @@ const missions = [
     "place": "Banca",
     "npc": "Impiegato Franco",
     "pos": {
-      "x": -28.0,
-      "z": 18.0
+      "x": -28,
+      "z": 18
     },
     "color": "#6b7b3a",
     "cefr": "B1",
@@ -3332,30 +3293,30 @@ const missions = [
         },
         "dialogue": [
           {
-            "prompt": "Cosa posso fare per Lei?",
-            "hint": "El empleado pregunta en qué puede ayudarte.",
+            "prompt": "Buongiorno. Di cosa ha bisogno oggi?",
+            "hint": "Pregunta qué necesitas. Di que quieres abrir una cuenta corriente (cortés).",
             "choices": [
-              "Vorrei cambiare dei soldi.",
-              "Voglio cambiare soldi.",
-              "Devo cambiare i miei soldi."
+              "Vorrei aprire un conto corrente.",
+              "Voglio aprire un conto corrente.",
+              "Vorrei aprire un conto di corrente."
             ],
             "correct": 0,
-            "explanation": "'Vorrei' es la forma cortés en condicional. 'Dei soldi' es el partitivo correcto.",
-            "successLine": "Certo! Che valuta ha?",
-            "failureLine": "Sportello chiuso."
+            "explanation": "'Conto corrente' es una locución fija sin 'di'; 'vorrei' mantiene el registro formal.",
+            "successLine": "Certo. Ha con sé un documento e il codice fiscale?",
+            "failureLine": "Mi scusi, non ho capito la richiesta."
           },
           {
-            "prompt": "Vuole il contante o un accredito sul conto?",
-            "hint": "Pregunta si quieres efectivo o depósito en cuenta.",
+            "prompt": "C'è una piccola commissione sul cambio. Va bene?",
+            "hint": "Avisa de una comisión. Acepta y pregunta por el tipo de cambio de hoy.",
             "choices": [
-              "Contante, per favore.",
-              "Soldi contanti, per piacere.",
-              "In contanti, grazie."
+              "Sì, va bene. Qual è il tasso di cambio oggi?",
+              "Sì, va bene. Qual è il tasso del cambio oggi?",
+              "Sì, va bene. Quanto è il cambio di tasso?"
             ],
             "correct": 0,
-            "explanation": "'Contante' es el término bancario para efectivo.",
-            "successLine": "Ecco. Il tasso oggi è favorevole.",
-            "failureLine": "Errore."
+            "explanation": "'Tasso di cambio' es la locución fija (tipo de cambio).",
+            "successLine": "Oggi è favorevole. Procedo con l'operazione.",
+            "failureLine": "Le spiego meglio le condizioni."
           }
         ]
       },
@@ -3435,8 +3396,8 @@ const missions = [
     "place": "Spiaggia",
     "npc": "Bagnino Gianni",
     "pos": {
-      "x": 30.0,
-      "z": 24.0
+      "x": 30,
+      "z": 24
     },
     "color": "#e8464b",
     "cefr": "A2",
@@ -3531,30 +3492,30 @@ const missions = [
         },
         "dialogue": [
           {
-            "prompt": "Vuole affittare un ombrellone?",
-            "hint": "Pregunta si quieres alquilar una sombrilla.",
+            "prompt": "Vuole anche due lettini con l'ombrellone?",
+            "hint": "Ofrece dos tumbonas. Di que sí, para todo el día.",
             "choices": [
-              "Sì, quanto costa?",
-              "Sì, quante costa?",
-              "Quanto per un ombrellone?"
+              "Sì, per tutta la giornata, grazie.",
+              "Sì, per tutto la giornata, grazie.",
+              "Sì, per tutta il giorno, grazie."
             ],
             "correct": 0,
-            "explanation": "'Quanto costa' es correcto para el precio singular.",
-            "successLine": "Quindici euro per tutto il giorno. Anche due lettini?",
-            "failureLine": "Tutto prenotato."
+            "explanation": "'Per tutta la giornata' — concordancia femenina con 'giornata'.",
+            "successLine": "Venti euro in totale. Prima o seconda fila?",
+            "failureLine": "Quanto tempo, scusi?"
           },
           {
-            "prompt": "Ha la crema solare? Il sole è forte oggi.",
-            "hint": "Recomienda usar protector solar.",
+            "prompt": "Il sole picchia forte. Ha la crema solare?",
+            "hint": "Pregunta si tienes protector. Di que sí, lo tienes en la bolsa.",
             "choices": [
-              "Sì, ce l'ho. Grazie.",
-              "Sì, la tengo. Grazie.",
-              "Sì, ho la crema. Grazie."
+              "Sì, ce l'ho nella borsa.",
+              "Sì, la ho nella borsa.",
+              "Sì, ce la ho nella borsa."
             ],
             "correct": 0,
-            "explanation": "'Ce l'ho' es la expresión idiomática correcta de posesión.",
-            "successLine": "Bene. Buona giornata!",
-            "failureLine": "Attento al sole."
+            "explanation": "'Ce l'ho' — forma idiomática con elisión obligatoria.",
+            "successLine": "Bene. Attenzione alle onde alte oggi!",
+            "failureLine": "Si copra, il sole è pericoloso."
           }
         ]
       },
@@ -3634,8 +3595,8 @@ const missions = [
     "place": "Cinema",
     "npc": "Cassiera Helena",
     "pos": {
-      "x": -10.0,
-      "z": 28.0
+      "x": -10,
+      "z": 28
     },
     "color": "#f5d76e",
     "cefr": "A2",
@@ -3731,30 +3692,30 @@ const missions = [
         },
         "dialogue": [
           {
-            "prompt": "Quale film vuole vedere?",
-            "hint": "Pregunta qué película quieres ver.",
+            "prompt": "Per quale spettacolo, quello delle otto o delle dieci?",
+            "hint": "Pregunta por la función. Elige la de las ocho.",
             "choices": [
-              "Quale mi consiglia?",
-              "Quale mi raccomanda?",
-              "Cosa c'è di bello?"
+              "Quello delle otto, per favore.",
+              "Quale delle otto, per favore.",
+              "Quello di le otto, per favore."
             ],
             "correct": 0,
-            "explanation": "'Quale mi consiglia' es la forma correcta con el verbo 'consigliare'.",
-            "successLine": "C'è un bellissimo film italiano! Inizia alle 21.",
-            "failureLine": "Film esaurito."
+            "explanation": "'Quello delle otto' (di + le). 'Quale' es interrogativo, no demostrativo.",
+            "successLine": "Perfetto. Quanti biglietti?",
+            "failureLine": "Non ho capito l'orario."
           },
           {
-            "prompt": "Dove preferisce sedersi?",
-            "hint": "Pregunta dónde prefieres sentarte.",
+            "prompt": "Dove preferisce sedersi in sala?",
+            "hint": "Pregunta dónde sentarte. Di que cerca del pasillo.",
             "choices": [
-              "In fondo, vicino al centro.",
-              "In dietro, vicino il centro.",
-              "In ultima fila, al centro."
+              "Vicino al corridoio, se possibile.",
+              "Vicino del corridoio, se possibile.",
+              "Vicino il corridoio, se possibile."
             ],
             "correct": 0,
-            "explanation": "'In fondo' es al fondo. 'Vicino al' usa la preposición articulada correcta.",
-            "successLine": "Ecco i biglietti! Buona visione!",
-            "failureLine": "Posti occupati."
+            "explanation": "'Vicino al corridoio' — 'vicino a' + 'il' = 'al'.",
+            "successLine": "Ottimo, fila G. Buona visione!",
+            "failureLine": "Quei posti sono occupati, scelga altro."
           }
         ]
       },
@@ -3834,8 +3795,8 @@ const missions = [
     "place": "Pronto Soccorso",
     "npc": "Infermiere Igor",
     "pos": {
-      "x": -8.0,
-      "z": 30.0
+      "x": -8,
+      "z": 30
     },
     "color": "#6b8e23",
     "cefr": "B1",
@@ -3931,30 +3892,30 @@ const missions = [
         },
         "dialogue": [
           {
-            "prompt": "Che tipo di dolore sente?",
-            "hint": "Pregunta qué tipo de dolor sientes.",
+            "prompt": "Da quanto tempo sente questo dolore?",
+            "hint": "Pregunta desde cuándo. Di que hace tres días y que hoy empeoró.",
             "choices": [
-              "È un dolore acuto allo stomaco.",
-              "È un dolore aguto allo stomaco.",
-              "È acuto. Nello stomaco."
+              "Da tre giorni, ma oggi è peggiorato.",
+              "Fa tre giorni, ma oggi è peggiorato.",
+              "Da tre giorni, ma oggi ha peggiorato."
             ],
             "correct": 0,
-            "explanation": "'Dolore acuto allo stomaco' usa la preposición articulada 'allo' correctamente.",
-            "successLine": "Da quanto tempo? Ha mangiato qualcosa di strano?",
-            "failureLine": "Descriva meglio."
+            "explanation": "'Da tre giorni' para duración continua; 'peggiorare' usa 'essere' (è peggiorato).",
+            "successLine": "È un dolore continuo o va e viene?",
+            "failureLine": "Devo capire meglio la durata."
           },
           {
-            "prompt": "Ha qualche allergia ai farmaci?",
-            "hint": "Pregunta por alergias a medicamentos.",
+            "prompt": "Come descriverebbe il dolore?",
+            "hint": "Pide describir el dolor. Di que es agudo y continuo.",
             "choices": [
-              "No, nessuna allergia nota.",
-              "No, nessuna di allergie.",
-              "Non che io ricordi."
+              "È un dolore acuto e continuo.",
+              "È un dolore acuta e continua.",
+              "È un dolore aguto e continuo."
             ],
             "correct": 0,
-            "explanation": "'Nessuna allergia nota' es la fórmula médica formal.",
-            "successLine": "Bene. Le farò una visita veloce.",
-            "failureLine": "Ripetere."
+            "explanation": "'Dolore' es masculino: 'acuto e continuo'. Y es 'acuto', no 'aguto'.",
+            "successLine": "Bene. Le misuro la pressione e vediamo.",
+            "failureLine": "Non capisco, mi dia più dettagli."
           }
         ]
       },
@@ -4034,8 +3995,8 @@ const missions = [
     "place": "Libreria",
     "npc": "Libraia Laura",
     "pos": {
-      "x": 8.0,
-      "z": 28.0
+      "x": 8,
+      "z": 28
     },
     "color": "#c4956a",
     "cefr": "B1",
@@ -4131,30 +4092,30 @@ const missions = [
         },
         "dialogue": [
           {
-            "prompt": "Che genere di libri le piace?",
-            "hint": "Pregunta qué género de libros te gusta.",
+            "prompt": "Sta cercando un regalo o qualcosa per Lei?",
+            "hint": "Pregunta si es un regalo. Di que un regalo y pide (cortés) que te aconseje una novela.",
             "choices": [
-              "Mi piacciono i romanzi storici.",
-              "Mi piacciono i romanze storici.",
-              "Preferisco romanzi storici, per piacere."
+              "Un regalo. Mi consiglierebbe un romanzo?",
+              "Un regalo. Mi consiglia un romanzo?",
+              "Un regalo. Mi puoi consigliare un romanzo?"
             ],
             "correct": 0,
-            "explanation": "'Mi piacciono i romanzi' es el plural masculino correcto en italiano.",
-            "successLine": "Allora ho il libro perfetto per Lei!",
-            "failureLine": "Scaffale sbagliato."
+            "explanation": "El condicional 'consiglierebbe' es más cortés para una petición formal (Lei).",
+            "successLine": "Certo. Le piace la narrativa o la saggistica?",
+            "failureLine": "Per chi è il regalo, mi scusi?"
           },
           {
-            "prompt": "Conosce questo autore italiano?",
-            "hint": "Pregunta si conoces a este autor italiano.",
+            "prompt": "Questo romanzo è molto amato. Lo conosce?",
+            "hint": "Pregunta si conoces la novela. Di que no y pide que te la aconseje.",
             "choices": [
-              "No, ma mi piacerebbe scoprirlo.",
-              "No, ma mi piacerebbe conoscerlo.",
-              "Non lo conosco, ma sembra interessante."
+              "No, non lo conosco. Me lo consiglia?",
+              "No, non la conosco. Me la consiglia?",
+              "No, non conosco lo. Me lo consiglia?"
             ],
             "correct": 0,
-            "explanation": "'Mi piacerebbe scoprirlo' es el condicional cortés correcto.",
-            "successLine": "Provi questo allora. È il suo capolavoro.",
-            "failureLine": "Difficile."
+            "explanation": "'Romanzo' es masculino → pronombre 'lo', antepuesto al verbo: 'non lo conosco'.",
+            "successLine": "Glielo incarto? È un'ottima scelta.",
+            "failureLine": "Ne cerchiamo un altro allora."
           }
         ]
       },
