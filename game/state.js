@@ -333,6 +333,13 @@ function showWelcome() {
   const translateAllBtn = document.getElementById("dialogueTranslateAllBtn");
   const speakDialogueBtn = document.getElementById("speakDialogueBtn");
   const translateDialogueBtn = document.getElementById("translateDialogueBtn");
+  // Regla A7/A3: la bienvenida reusa #dialogue-panel pero showDialogueStep()
+  // nunca corre aquí, así que la X nunca queda cableada por
+  // setupDialogueHeaderTools(). closeDialogue() (game/dialogue.js) es
+  // null-safe (no depende de activeMission) — sirve igual para la X y para
+  // "Inizia l'avventura!", igual que produce Esc vía el registro de modales.
+  const closeBtn = document.getElementById("dialogueClose");
+  if (closeBtn) closeBtn.onclick = closeDialogue;
   speaker.textContent = "Benvenuto in Italia!";
   speakerRole.textContent = "Guida Turistica";
   avatarChar.textContent = "G";
@@ -363,10 +370,8 @@ function showWelcome() {
   btn.style.opacity = "1";
   btn.style.animation = "none";
   btn.innerHTML = "<span class=\"option-marker\">▶</span><span class=\"option-text\" style=\"font-weight:700;\">Inizia l'avventura!</span>";
-  btn.onclick = () => {
-    panel.style.display = "none";
-    state.inDialogue = false;
-  };
+  btn.dataset.dialogueAction = "begin-welcome";
+  btn.onclick = closeDialogue;
   optionsContainer.appendChild(btn);
 }
 

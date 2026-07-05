@@ -543,37 +543,20 @@ function fillPlayerName(text) {
   return String(text || "").replace(/\{name\}/g, state.playerName || "Studente");
 }
 
-function hashString(value) {
-  let hash = 0;
-  for (let i = 0; i < value.length; i++) {
-    hash = ((hash << 5) - hash + value.charCodeAt(i)) | 0;
-  }
-  return Math.abs(hash);
-}
-
+// Regla A12: la posición de la opción correcta NO debe ser memorizable — se
+// baraja con Math.random() en cada apertura del paso (no con una semilla
+// determinista). answerMission sigue comparando por originalIndex, así que
+// el barajado nunca afecta qué respuesta es correcta.
 function getDisplayChoices(mission, step) {
   const choices = step.choices.map((text, originalIndex) => ({ text, originalIndex }));
   if (choices.length <= 1) return choices;
 
-  const correctChoice = choices.find(choice => choice.originalIndex === step.correct);
-  const others = choices.filter(choice => choice.originalIndex !== step.correct);
-  const seed = hashString(`${mission.id}:${state.dialogueTurn}:${step.prompt}`);
-
-  for (let i = others.length - 1; i > 0; i--) {
-    const j = (seed + i) % (i + 1);
-    [others[i], others[j]] = [others[j], others[i]];
+  for (let i = choices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [choices[i], choices[j]] = [choices[j], choices[i]];
   }
 
-  const correctSlot = (seed % (choices.length - 1)) + 1;
-  const ordered = [];
-  ordered[correctSlot] = correctChoice;
-
-  let otherIndex = 0;
-  for (let i = 0; i < choices.length; i++) {
-    if (!ordered[i]) ordered[i] = others[otherIndex++];
-  }
-
-  return ordered;
+  return choices;
 }
 
 function getTextTranslation(text, context = {}) {
@@ -687,9 +670,9 @@ function setupDialogueHeaderTools() {
   }
 }
 
-function playCurrentInteractionAudio() {
+function playCurrentInteractionAudio(overrideTexts) {
   if (typeof window.speakItalianSequence === "function") {
-    window.speakItalianSequence(currentInteractionAudioTexts);
+    window.speakItalianSequence(overrideTexts || currentInteractionAudioTexts);
   }
 }
 
@@ -700,10 +683,14 @@ function toggleCurrentInteractionAudio() {
   playCurrentInteractionAudio();
 }
 
-function queueCurrentInteractionAudio() {
+// overrideTexts (regla A11): si se pasa, se auto-reproduce SOLO eso (p. ej. el
+// saludo en la fase de vocabulario), sin tocar currentInteractionAudioTexts —
+// así "▶ Todo"/toggleCurrentInteractionAudio() siguen reproduciendo la
+// interacción completa cuando se piden explícitamente.
+function queueCurrentInteractionAudio(overrideTexts) {
   if (dialogueAutoSpeechTimer) clearTimeout(dialogueAutoSpeechTimer);
   dialogueAutoSpeechTimer = setTimeout(() => {
-    if (state.inDialogue) playCurrentInteractionAudio();
+    if (state.inDialogue) playCurrentInteractionAudio(overrideTexts);
   }, 180);
 }
 
@@ -724,9 +711,13 @@ function handleDialogueShortcuts(e) {
     return;
   }
   if (key === "enter") {
+    const welcomeBtn = document.querySelector("[data-dialogue-action='begin-welcome']");
     const beginBtn = document.querySelector("[data-dialogue-action='begin-mission']");
     const nextBtn = document.getElementById("dialogue-next-btn");
-    if (state.inVocabPhase && beginBtn) {
+    if (welcomeBtn) {
+      e.preventDefault();
+      welcomeBtn.click();
+    } else if (state.inVocabPhase && beginBtn) {
       e.preventDefault();
       beginBtn.click();
     } else if (nextBtn && document.getElementById("dialogue-feedback")?.style.display === "block") {
@@ -1082,7 +1073,7 @@ function answerMission(choiceIndex) {
     const diagnosisText = getDiagnosisText(mission, choiceIndex);
     currentInteractionAudioTexts = [fillPlayerName(step.failureLine)];
     explanationText.innerHTML = `<div class="feedback-summary">
-      <p class="feedback-summary-row"><strong>Correcta:</strong> ${escapeHtml(fillPlayerName(step.choices[step.correct]))}.</p>
+      <p class="feedback-summary-row"><strong style="color:#f2b84b;">Correcta:</strong> ${escapeHtml(fillPlayerName(step.choices[step.correct]))}.</p>
       <p class="feedback-summary-row">${step.explanation}</p>
       ${diagnosisText ? `<p class="feedback-note"><strong style="color:#f2b84b;">Diagnóstico:</strong> ${diagnosisText}</p>` : ""}
       <p class="feedback-summary-row"><span style="color: #ff3b30;">${escapeHtml(fillPlayerName(step.failureLine))}</span>${translationHtml(step.failureLine, { kind: "feedback", step, mission })}</p>

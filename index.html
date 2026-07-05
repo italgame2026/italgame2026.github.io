@@ -403,8 +403,25 @@
 
       .feedback-explanation {
         font-size: 13px;
-        opacity: 0.9;
+        color: #f0e8d0;
         margin-top: 4px;
+      }
+
+      /* Regla F2: sin CSS propio, .feedback-summary-row heredaba el color por
+         defecto del navegador (negro) sobre el panel casi negro → texto
+         invisible. Cuerpo en cream alto contraste; los rótulos ("Correcta:",
+         "Diagnóstico:") van en ámbar vía inline style junto a cada uno. */
+      .feedback-summary-row {
+        color: #f0e8d0;
+        margin: 6px 0;
+      }
+
+      /* Mismo bug: el diagnóstico de error (dialogue.js:answerMission) usa esta
+         clase, distinta de .feedback-summary-row — sin esto el rótulo salía
+         ámbar (inline) pero el cuerpo del diagnóstico seguía invisible. */
+      .feedback-note {
+        color: #f0e8d0;
+        margin: 6px 0;
       }
 
       .dialogue-footer {
@@ -789,9 +806,9 @@
     <script src="data/curriculum.js" defer></script>
     <script src="data/missions.js?v=4" defer></script>
     <script src="audio/audio.js?v=4" defer></script>
-    <script src="game/state.js?v=36" defer></script>
+    <script src="game/state.js?v=37" defer></script>
     <script src="game/character.js?v=3" defer></script>
-    <script src="game/dialogue.js?v=39" defer></script>
+    <script src="game/dialogue.js?v=40" defer></script>
     <script src="game/npcLoader.js?v=7" defer></script>
     <script src="game/world.js?v=4" defer></script>
     <script src="game.js?v=42" defer></script>
