@@ -985,8 +985,8 @@ function answerMission(choiceIndex) {
     state.learningMetrics[levelKey].correct++;
     if (typeof sfxCorrect === "function") sfxCorrect();
 
-    feedbackPanel.className = "dialogue-feedback success";
-    feedbackStatus.className = "feedback-status success";
+    feedbackPanel.className = "dialogue-feedback correct";
+    feedbackStatus.className = "feedback-status correct";
     feedbackTitle.textContent = "¡Correcto!";
 
     const nextTurn = state.dialogueTurn + 1;
@@ -1060,8 +1060,8 @@ function answerMission(choiceIndex) {
     state.energy = Math.max(0, state.energy - 15);
     if (typeof sfxWrong === "function") sfxWrong();
 
-    feedbackPanel.className = "dialogue-feedback error";
-    feedbackStatus.className = "feedback-status error";
+    feedbackPanel.className = "dialogue-feedback wrong";
+    feedbackStatus.className = "feedback-status wrong";
     feedbackTitle.textContent = "¡Incorrecto!";
 
     if (mission.failEvent === "badFood" || mission.failEvent === "awkward") {
