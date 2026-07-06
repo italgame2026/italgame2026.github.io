@@ -6,7 +6,7 @@ const missions = [
     "id": "caffe",
     "level": "A1",
     "place": "Caffetteria",
-    "npc": "Barista Sofia",
+    "npc": "Barista Chiara",
     "pos": {
       "x": 8.2,
       "z": -9.4
@@ -99,8 +99,8 @@ const missions = [
         "failureLine": "Come dice?"
       }
     ],
-    "success": "Sofia prepara un caffè perfetto. Ti senti el benvenuto in Italia.",
-    "failure": "Sofia cerca di capirti ma l'ordine esce confuso.",
+    "success": "Chiara prepara un caffè perfetto. Ti senti el benvenuto in Italia.",
+    "failure": "Chiara cerca di capirti ma l'ordine esce confuso.",
     "reward": {
       "name": "Caffe",
       "points": 15,
@@ -3194,7 +3194,7 @@ const missions = [
     "id": "banca",
     "level": "B1",
     "place": "Banca",
-    "npc": "Impiegato Franco",
+    "npc": "Impiegato Enzo",
     "pos": {
       "x": -28,
       "z": 18
@@ -3277,7 +3277,7 @@ const missions = [
         "failureLine": "C'è una commissione di cinque euro. Procedo lo stesso?"
       }
     ],
-    "success": "Franco elabora il cambio rapidamente con un buon tasso.",
+    "success": "Enzo elabora il cambio rapidamente con un buon tasso.",
     "failure": "Ti applicano una commissione a sorpresa del 20%.",
     "reward": {
       "name": "Panna Cotta",

@@ -30,11 +30,18 @@ var NPC_MANIFEST = window.useHvGirl ? [
   { key: "male-c", base: "game/models/characters/kenney-mini-people/", file: "character-male-c.glb" },
   { key: "male-d", base: "game/models/characters/kenney-mini-people/", file: "character-male-d.glb" },
   { key: "male-e", base: "game/models/characters/kenney-mini-people/", file: "character-male-e.glb" },
-  { key: "male-f", base: "game/models/characters/kenney-mini-people/", file: "character-male-f.glb" }
+  { key: "male-f", base: "game/models/characters/kenney-mini-people/", file: "character-male-f.glb" },
+  // HVGirl (CC-BY) — cargada siempre para NPCs con override de baile (ej. festa #10).
+  // Los Kenney no tienen animación de baile; HVGirl sí trae "samba".
+  { key: "hvgirl", base: "https://assets.babylonjs.com/meshes/", file: "HVGirl.glb", scale: 0.09, rotY180: true, idleAnimName: "idle", walkAnimName: "walking", sambaAnimName: "samba" }
 ];
 
 // IDs de misión que arrancan con animación Samba (variedad visual italiana)
 var NPC_SAMBA_IDS = { "festa": true, "parco": true, "gelateria": true };
+
+// Override de modelo por misión: fuerza un modelo concreto para ese NPC,
+// por encima del roleMap. #10 "festa" → HVGirl bailando samba.
+var NPC_MODEL_OVERRIDE = { "festa": "hvgirl" };
 
 function loadNpcModels(scene, onReady) {
   var total = NPC_MANIFEST.length;
@@ -90,6 +97,7 @@ function spawnHumanoidNpc(scene, id, pos, rotY, shadowFn) {
     };
     modelKey = roleMap[id] || "female-a";
   }
+  if (NPC_MODEL_OVERRIDE[id]) modelKey = NPC_MODEL_OVERRIDE[id];
 
   var entry = NPC_CONTAINERS[modelKey];
   if (!entry) {
@@ -136,7 +144,7 @@ function spawnHumanoidNpc(scene, id, pos, rotY, shadowFn) {
   var glbRoot = instances.rootNodes[0];
   glbRoot.parent = controlNode;
   
-  if (window.useHvGirl) {
+  if (def.scale != null) {
     glbRoot.scaling.setAll(def.scale || 0.09);
     if (def.rotY180) {
       var rot180 = BABYLON.Quaternion.RotationYawPitchRoll(Math.PI, 0, 0);
@@ -169,7 +177,7 @@ function spawnHumanoidNpc(scene, id, pos, rotY, shadowFn) {
     var base = ag.name.replace(/^Clone of /i, "");
     ag.name = prefix + base;
     var lower = base.toLowerCase();
-    if (window.useHvGirl) {
+    if (def.idleAnimName) {
       if (!idleAnim  && lower === (def.idleAnimName  || "idle"))   idleAnim  = ag;
       if (!walkAnim  && lower === (def.walkAnimName  || "walking")) walkAnim  = ag;
       if (!sambaAnim && lower === (def.sambaAnimName || "samba"))   sambaAnim = ag;
