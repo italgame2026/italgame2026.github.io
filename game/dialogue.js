@@ -815,9 +815,12 @@ function openDialogue(mission) {
       </div>
     `;
 
-    // 2. Vocabulario de Misión
+    // 2. Vocabulario de Misión — con botón para escuchar TODO el vocabulario
     html += `
-      <div style="margin-bottom: 10px; font-weight: bold; color: #f2b84b; font-size: 14.5px;">Vocabolario della missione:</div>
+      <div style="margin-bottom: 10px; font-weight: bold; color: #f2b84b; font-size: 14.5px; display: flex; align-items: center; gap: 8px;">
+        <span id="vocabPlayAllBtn" role="button" tabindex="0" title="Escuchar todo el vocabulario" aria-label="Escuchar todo el vocabulario" style="cursor: pointer; background: rgba(76, 217, 100, 0.15); padding: 3px 9px; border-radius: 6px; font-size: 12px; color: #4cd964; font-weight: bold; user-select: none;">🔊</span>
+        <span>Vocabolario della missione:</span>
+      </div>
       <div style="max-height: 150px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px;">
     `;
     
@@ -839,6 +842,20 @@ function openDialogue(mission) {
     });
     html += `</div>`;
     dialogueText.innerHTML = html;
+
+    // Botón "escuchar todo el vocabulario": reproduce en secuencia todas las palabras.
+    var vocabPlayAllBtn = document.getElementById("vocabPlayAllBtn");
+    if (vocabPlayAllBtn) {
+      var speakAllVocab = function () {
+        if (typeof window.speakItalianSequence === "function") {
+          window.speakItalianSequence(content.vocab.map(function (v) { return v.it; }));
+        }
+      };
+      vocabPlayAllBtn.onclick = speakAllVocab;
+      vocabPlayAllBtn.onkeydown = function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); speakAllVocab(); }
+      };
+    }
 
     optionsContainer.innerHTML = "";
     const beginBtn = document.createElement("button");
