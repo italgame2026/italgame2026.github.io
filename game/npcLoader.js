@@ -31,6 +31,7 @@ var NPC_MANIFEST = window.useHvGirl ? [
   { key: "male-d", base: "game/models/characters/kenney-mini-people/", file: "character-male-d.glb" },
   { key: "male-e", base: "game/models/characters/kenney-mini-people/", file: "character-male-e.glb" },
   { key: "male-f", base: "game/models/characters/kenney-mini-people/", file: "character-male-f.glb" },
+  { key: "panadero", base: "game/models/characters/panadero/", file: "panadero.glb" },
   // HVGirl (CC-BY) — cargada siempre para NPCs con override de baile (ej. festa #10).
   // Los Kenney no tienen animación de baile; HVGirl sí trae "samba".
   { key: "hvgirl", base: "https://assets.babylonjs.com/meshes/", file: "HVGirl.glb", scale: 0.09, rotY180: true, idleAnimName: "idle", walkAnimName: "walking", sambaAnimName: "samba" }
@@ -75,7 +76,7 @@ function spawnHumanoidNpc(scene, id, pos, rotY, shadowFn) {
   } else {
     var roleMap = {
       caffe: "female-a",
-      panetteria: "male-a",
+      panetteria: "panadero",
       mercato: "female-b",
       parrucchiere: "male-b",
       stazione: "male-c",
